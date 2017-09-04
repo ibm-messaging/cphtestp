@@ -65,4 +65,3 @@ cat /home/mqperf/cph/results
 echo "----------------------------------------"
 echo "cph testing finished--------------------"
 echo "----------------------------------------"
-#exec mq-monitor-qmgr.sh ${MQ_QMGR_NAME}
