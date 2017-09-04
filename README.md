@@ -1,5 +1,5 @@
 # cphtestp
-Environment for creating docker image for running cph performance tests for Persistent messaging.
+Environment for creating a docker image for running cph performance tests for Persistent messaging.
 
 This repository contains a set of files to help create a Docker image containing the CPH executable.
 
@@ -20,5 +20,4 @@ then run in network host mode to connect and run tests against a local QM:
 
 `docker run -it --detach --net="host" cphtestp`
 
-The current configuration looks for a local QM called PERF0 with a listener configured on port 1420. You can either edit the scripts to support
-a different configuration or alter them to utilise environment variables which could be provided in your run command.
+The current configuration looks for a local QM called PERF0 with a listener configured on port 1420. You can either edit the scripts to support a different configuration or alter them to utilise environment variables which could be provided in your run command.
