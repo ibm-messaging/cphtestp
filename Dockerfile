@@ -69,7 +69,5 @@ COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
 USER mqperf
 WORKDIR /home/mqperf/cph
-#RUN chmod +x /usr/local/bin/*.sh
 
-#ENTRYPOINT ["/bin/bash"]
 ENTRYPOINT ["./cphTest.sh"]
