@@ -3,12 +3,14 @@ Environment for creating docker image for running cph performance tests for Pers
 
 This repository contains a set of files to help create a Docker image containing the CPH executable.
 
-You will need to seperately download the MQ Client code (for which license agreement is required) and copy the following files into the root
-directory before building your docker image:
+You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your docker image:
 * /lap/
 *  mqlicense.sh
 *  ibmmq-client_9.0.3.0_amd64.deb
 *  ibmmq-runtime_9.0.3.0_amd64.deb
+
+The MQ V9 client can be obtained from:
+http://www-01.ibm.com/support/docview.wss?uid=swg24042176
 
 then perform a docker build as normal:
 
