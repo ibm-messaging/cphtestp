@@ -18,6 +18,9 @@ echo "$threads thread " >> /home/mqperf/cph/results
 export threads=8
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
+export threads=16
+echo "$threads threads " >> /home/mqperf/cph/results
+./cphreq.sh $threads | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 export threads=32
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
@@ -38,6 +41,9 @@ echo "$threads thread " >> /home/mqperf/cph/results
 export threads=8
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 20480 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
+export threads=16
+echo "$threads threads " >> /home/mqperf/cph/results
+./cphreq.sh $threads 20480 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 export threads=32
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 20480 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
@@ -56,6 +62,9 @@ export threads=1
 echo "$threads thread " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 204800 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 export threads=8
+echo "$threads threads " >> /home/mqperf/cph/results
+./cphreq.sh $threads 204800 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
+export threads=16
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 204800 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 export threads=32
