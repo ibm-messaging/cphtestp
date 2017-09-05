@@ -1,5 +1,5 @@
 # cphtestp
-Environment for creating a docker image for running cph performance tests for Persistent messaging.
+Environment for creating a docker image running cph performance tests for Persistent messaging.
 
 This repository contains a set of files to help create a Docker image containing the CPH executable.
 
