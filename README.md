@@ -26,10 +26,15 @@ The container will run a number of tests using different numbers of threads with
 https://ibm-messaging.github.io/mqperf/
 
 When the testing is complete the final results will be posted to the docker logs and can be viewed in the normal way:
+
 `docker logs <containerID>`
+
 You can also obtain the available results by:
+
 `docker cp <containerID>:/home/mqperf/cph/results .`
+
 The output from the running responder and requester processes can be viewed by:
+
 `docker cp <containerID>:/home/mqperf/cph/output .`
 
 The version of cph contained in this image was taken on 4th August 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
