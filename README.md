@@ -21,3 +21,6 @@ then run in network host mode to connect and run tests against a local QM:
 `docker run -it --detach --net="host" cphtestp`
 
 The current configuration looks for a local QM called PERF0 with a listener configured on port 1420. You can either edit the scripts to support a different configuration or alter them to utilise environment variables which could be provided in your run command.
+
+The version of cph contained in this image was taken on 4th August 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
+https://github.com/ibm-messaging/mq-cph
