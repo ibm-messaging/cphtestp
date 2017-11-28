@@ -51,8 +51,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   # Optional: Update the command prompt with the MQ version
   && echo "cph" > /etc/debian_chroot \
   && sed -i 's/password\t\[success=1 default=ignore\]\tpam_unix\.so obscure sha512/password\t[success=1 default=ignore]\tpam_unix.so obscure sha512 minlen=8/' /etc/pam.d/common-password \
-  && groupadd --gid 1000 mqm \
-  && useradd mqperf -G mqm \
+  && groupadd --system --gid 999 mqm \
+  && useradd --system --uid 999 --gid mqm mqperf \
   && echo mqperf:orland02 | chpasswd \
   && mkdir -p /home/mqperf/cph \
   && chown -R mqperf /home/mqperf/cph \
@@ -60,8 +60,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.0.3.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.0.3.0_amd64.deb 
+  && dpkg -i ibmmq-runtime_9.0.4.0_amd64.deb \
+  && dpkg -i ibmmq-client_9.0.4.0_amd64.deb 
 
 
 COPY cph/* /home/mqperf/cph/
@@ -69,5 +69,11 @@ COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
 USER mqperf
 WORKDIR /home/mqperf/cph
+
+ENV MQ_QMGR_NAME=PERF0
+ENV MQ_QMGR_PORT=1420
+ENV MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN
+ENV MQ_QMGR_QREQUEST_PREFIX=REQUEST
+ENV MQ_QMGR_QREPLY_PREFIX=REPLY
 
 ENTRYPOINT ["./cphTest.sh"]

@@ -2,15 +2,20 @@
 echo "----------------------------------------"
 echo "Initialising test environment-----------"
 echo "----------------------------------------"
-export MQSERVER="SYSTEM.ADMIN.SVRCONN/TCP/localhost(1420)";
-cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c > /home/mqperf/cph/output
+qmname="${MQ_QMGR_NAME:-PERF0}"
+host="${MQ_QMGR_HOSTNAME:-localhost}"
+port="${MQ_QMGR_PORT:-1420}"
+echo "Testing QM: $qmname on host: $host using port: $port"
+echo "Testing QM: $qmname on host: $host using port: $port" > /home/mqperf/cph/results
+export MQSERVER="SYSTEM.ADMIN.SVRCONN/TCP/$host($port)";
+cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c $qmname > /home/mqperf/cph/output
 echo "----------------------------------------"
 echo "Starting cph tests----------------------"
 echo "----------------------------------------"
 ./cphresp.sh >> /home/mqperf/cph/output &
 #Wait for responders to start
 sleep 30
-echo "CPH Test Results" > /home/mqperf/cph/results
+echo "CPH Test Results" >> /home/mqperf/cph/results
 echo "2K Persistent" >> /home/mqperf/cph/results
 export threads=1
 echo "$threads thread " >> /home/mqperf/cph/results
