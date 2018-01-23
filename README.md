@@ -22,7 +22,7 @@ then run in network host mode to connect and run tests against a local QM:
 
 The default configuration looks for a QM located on the localhost called PERF0 with a listener configured on port 1420. You can override a number of options by setting environment variables on the docker run command.
 
-`docker run -it --detach --net="host" cphtestp --env MQ_QMGR_NAME=PERF1 --env MQ_QMGR_HOSTNAME=10.0.0.1 --env MQ_QMGR_PORT=1414 --env MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN --env MQ_QMGR_QREQUEST_PREFIX=REQUEST --env MQ_QMGR_QREPLY_PREFIX=REPLY`
+`docker run -it --detach --net="host" --env MQ_QMGR_NAME=PERF1 --env MQ_QMGR_HOSTNAME=10.0.0.1 --env MQ_QMGR_PORT=1414 --env MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN --env MQ_QMGR_QREQUEST_PREFIX=REQUEST --env MQ_QMGR_QREPLY_PREFIX=REPLY cphtestp`
 
 In addition to the hostname, port and and QM name, the default channel can be overidden using the MQ_QMGR_CHANNEL envvar and the queue prefixes used for the testing can be set using MQ_QMGR_QREQUEST_PREFIX and MQ_QMGR_QREPLY_PREFIX.
 
@@ -40,6 +40,10 @@ You can also obtain the available results by:
 The output from the running responder and requester processes can be viewed by:
 
 `docker cp <containerID>:/home/mqperf/cph/output .`
+
+An interactive session with the running container can be access by:
+
+'docker -ti <containerID> /bin/bash'
 
 The version of cph contained in this image was taken on 4th August 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
