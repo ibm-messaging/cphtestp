@@ -43,7 +43,7 @@ The output from the running responder and requester processes can be viewed by:
 
 An interactive session with the running container can be access by:
 
-'docker -ti <containerID> /bin/bash'
+`docker -ti <containerID> /bin/bash`
 
-The version of cph contained in this image was taken on 4th August 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
+The version of cph contained in this image was taken on 28th November 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
