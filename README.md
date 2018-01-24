@@ -26,6 +26,23 @@ The default configuration looks for a QM located on the localhost called PERF0 w
 
 In addition to the hostname, port and and QM name, the default channel can be overidden using the MQ_QMGR_CHANNEL envvar and the queue prefixes used for the testing can be set using MQ_QMGR_QREQUEST_PREFIX and MQ_QMGR_QREPLY_PREFIX.
 
+In the latest release further configuration options have been added. The table below provides the full set:
+
+| Envvar                  | Description                                          | Default if not set |
+|-------------------------|------------------------------------------------------|--------------------|
+| MQ_QMGR_NAME            | Queue Manager Name                                   | PERF0              |
+| MQ_QMGR_HOSTNAME        | Hostname where QM is running                         | localhost          |
+| MQ_QMGR_PORT            | Port where QM listener is running                    | 1420               |
+| MQ_QMGR_CHANNEL         | Channel name to use to connect to QM                 | SYSTEM.DEF.SVRCONN |
+| MQ_RESPONDER_THREADS    | Number of responder threads to run                   | 200                |
+| MQ_QMGR_QREQUEST_PREFIX | Prefix of request queues to use.                     | REQUEST            |
+| MQ_QMGR_QREPLY_PREFIX   | Prefix of reply queues to use.                       | REPLY              |
+| MQ_USERID               | Userid to use when authenticating                    |                    |
+| MQ_PASSWORD             | Password to use when authenticating                  |                    |
+| MQ_CPH_EXTRA            | Additional string field to propogate to cph client   |                    |
+
+
+
 The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
 https://ibm-messaging.github.io/mqperf/
 
