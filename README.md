@@ -1,7 +1,7 @@
 # cphtestp
 Environment for creating a docker image running cph performance tests for Persistent messaging.
 
-This repository contains a set of files to help create a Docker image containing the CPH executable.
+This repository contains a set of files to help create a Docker image containing the CPH executable and a set of scripts to run an inital set of performance tests.
 
 You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your docker image:
 * /lap/
