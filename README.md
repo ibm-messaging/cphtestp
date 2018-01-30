@@ -37,6 +37,7 @@ In the latest release further configuration options have been added. The table b
 | MQ_RESPONDER_THREADS    | Number of responder threads to run                   | 200                |
 | MQ_QMGR_QREQUEST_PREFIX | Prefix of request queues to use.                     | REQUEST            |
 | MQ_QMGR_QREPLY_PREFIX   | Prefix of reply queues to use.                       | REPLY              |
+| MQ_NON_PERSISTENT       | QOS to be used by connecting clients                 | 0 (Persistent)     |
 | MQ_USERID               | Userid to use when authenticating                    |                    |
 | MQ_PASSWORD             | Password to use when authenticating                  |                    |
 | MQ_CPH_EXTRA            | Additional string field to propogate to cph client   |                    |
