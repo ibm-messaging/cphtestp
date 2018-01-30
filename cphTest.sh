@@ -6,10 +6,22 @@ qmname="${MQ_QMGR_NAME:-PERF0}"
 host="${MQ_QMGR_HOSTNAME:-localhost}"
 port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
+nonpersistent="${MQ_NON_PERSISTENT:-0}"
+
+if [ "${nonpersistent}" -eq 1 ]; then
+  echo "Running Non Persistent Messaging Tests"
+  echo "Running Non Persistent Messaging Tests" > /home/mqperf/cph/results
+else
+  echo "Running Persistent Messaging Tests"
+  echo "Running Persistent Messaging Tests" > /home/mqperf/cph/results
+fi
+echo "----------------------------------------"
+
 echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" 
-echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" > /home/mqperf/cph/results
+echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" >> /home/mqperf/cph/results
 
 if [ -n "${MQ_CPH_EXTRA}" ]; then
+  echo "Extra CPH flags: ${MQ_CPH_EXTRA}" 
   echo "Extra CPH flags: ${MQ_CPH_EXTRA}" >> /home/mqperf/cph/results
 fi
 
@@ -33,7 +45,7 @@ echo "----------------------------------------"
 #Wait for responders to start
 sleep 30
 echo "CPH Test Results" >> /home/mqperf/cph/results
-echo "2K Persistent" >> /home/mqperf/cph/results
+echo "2K" >> /home/mqperf/cph/results
 export threads=1
 echo "$threads thread " >> /home/mqperf/cph/results
 ./cphreq.sh $threads | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
@@ -56,7 +68,7 @@ export threads=200
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 echo "" >> /home/mqperf/cph/results
-echo "20K Persistent" >> /home/mqperf/cph/results
+echo "20K" >> /home/mqperf/cph/results
 export threads=1
 echo "$threads thread " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 20480 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
@@ -79,7 +91,7 @@ export threads=200
 echo "$threads threads " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 20480 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
 echo "" >> /home/mqperf/cph/results
-echo "200K Persistent" >> /home/mqperf/cph/results
+echo "200K" >> /home/mqperf/cph/results
 export threads=1
 echo "$threads thread " >> /home/mqperf/cph/results
 ./cphreq.sh $threads 204800 | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results

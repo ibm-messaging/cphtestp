@@ -12,9 +12,17 @@ replyq="${MQ_QMGR_QREPLY_PREFIX:-REPLY}"
 extra="${MQ_CPH_EXTRA}"
 userid="${MQ_USERID}"
 password="${MQ_PASSWORD}"
+nonpersistent="${MQ_NON_PERSISTENT:-0}"
+
+if [ "${nonpersistent}" -eq 1 ]; then
+  persistent_flags="-tx false -pp false"
+else
+  persistent_flags="-tx true -pp true"
+fi
+
 
 if [ -n "${MQ_USERID}" ]; then
-  ./cph -nt $threads -ms $msgsize -rl 180 -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 -pp true -tx true -us $userid -pw $password $extra
+  ./cph -nt $threads -ms $msgsize -rl 180 -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -us $userid -pw $password $extra
 else
-  ./cph -nt $threads -ms $msgsize -rl 180 -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 -pp true -tx true $extra
+  ./cph -nt $threads -ms $msgsize -rl 180 -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags $extra
 fi
