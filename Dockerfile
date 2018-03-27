@@ -73,6 +73,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 COPY cph/* /home/mqperf/cph/
 COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
+COPY qmmonitor2 /home/mqperf/cph/
 USER mqperf
 WORKDIR /home/mqperf/cph
 
