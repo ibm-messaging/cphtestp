@@ -66,8 +66,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.0.4.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.0.4.0_amd64.deb 
+  && dpkg -i ibmmq-runtime_9.0.5.0_amd64.deb \
+  && dpkg -i ibmmq-client_9.0.5.0_amd64.deb 
 
 
 COPY cph/* /home/mqperf/cph/
