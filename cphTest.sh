@@ -25,12 +25,15 @@ port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 
+echo $(date)
+echo $(date) > /home/mqperf/cph/results
+
 if [ "${nonpersistent}" -eq 1 ]; then
   echo "Running Non Persistent Messaging Tests"
-  echo "Running Non Persistent Messaging Tests" > /home/mqperf/cph/results
+  echo "Running Non Persistent Messaging Tests" >> /home/mqperf/cph/results
 else
   echo "Running Persistent Messaging Tests"
-  echo "Running Persistent Messaging Tests" > /home/mqperf/cph/results
+  echo "Running Persistent Messaging Tests" >> /home/mqperf/cph/results
 fi
 echo "----------------------------------------"
 
@@ -74,6 +77,7 @@ echo "----------------------------------------"
 #Wait for responders to start
 sleep 30
 echo "CPH Test Results" >> /home/mqperf/cph/results
+echo $(date) >> /home/mqperf/cph/results
 echo "2K" >> /home/mqperf/cph/results
 runclients 1
 runclients 8
@@ -83,6 +87,7 @@ runclients 64
 runclients 128
 runclients 200
 echo "----" >> /home/mqperf/cph/results
+echo $(date) >> /home/mqperf/cph/results
 echo "20K" >> /home/mqperf/cph/results
 runclients 1 20480
 runclients 8 20480
@@ -92,6 +97,7 @@ runclients 64 20480
 runclients 128 20480
 runclients 200 20480
 echo "----" >> /home/mqperf/cph/results
+echo $(date) >> /home/mqperf/cph/results
 echo "200K" >> /home/mqperf/cph/results
 runclients 1 204800
 runclients 8 204800
