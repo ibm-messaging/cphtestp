@@ -128,7 +128,13 @@ runclients 128 204800
 runclients 200 204800
 echo "" >> /home/mqperf/cph/results
 
-cat /home/mqperf/cph/results
+if ! [ ${MQ_RESULTS} == "FALSE" ]; then
+  cat /home/mqperf/cph/results
+fi
+
+if [ -n "${MQ_RESULTS_CSV}" ]; then
+  cat /home/mqperf/cph/results.csv
+fi
 
 if [ -n "${MQ_DATA}" ]; then
   cat /tmp/system
