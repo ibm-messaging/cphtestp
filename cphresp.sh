@@ -20,8 +20,8 @@ else
 fi
 
 if [ -n "${MQ_USERID}" ]; then
-  ./cph -nt $threads -ms 204800 -vo 3 -rl 0 -id 1 -tc Responder -ss 0 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -wt 10 -to -1 $persistent_flags -us $userid -pw $password $extra
+  ./cph -nt $threads -ms 204800 -vo 3 -rl 0 -id 1 -tc Responder -ss 0 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -wt 30 -to -1 $persistent_flags -us $userid -pw $password $extra
 else
-  ./cph -nt $threads -ms 204800 -vo 3 -rl 0 -id 1 -tc Responder -ss 0 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -wt 10 -to -1 $persistent_flags $extra
+  ./cph -nt $threads -ms 204800 -vo 3 -rl 0 -id 1 -tc Responder -ss 0 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -wt 30 -to -1 $persistent_flags $extra
 fi
 

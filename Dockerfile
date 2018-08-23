@@ -54,7 +54,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && apt-get upgrade -y libexpat1 \
   # End of bug fixes
   && rm -rf /var/lib/apt/lists/* \
-  # Optional: Update the command prompt with the MQ version
+  # Optional: Update the command prompt 
   && echo "cph" > /etc/debian_chroot \
   && sed -i 's/password\t\[success=1 default=ignore\]\tpam_unix\.so obscure sha512/password\t[success=1 default=ignore]\tpam_unix.so obscure sha512 minlen=8/' /etc/pam.d/common-password \
   && groupadd --system --gid 999 mqm \

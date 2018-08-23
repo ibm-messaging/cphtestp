@@ -2,18 +2,38 @@
 
 #Functions
 function runclients {
-threads=$1
-msgsize=$2
+  threads=$1
+  msgsize=$2
   echo "threads=$threads" >> /home/mqperf/cph/results
   echo "Starting test with $threads requesters" >> /home/mqperf/cph/output
-  ./cphreq.sh $threads $msgsize | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }' >> /home/mqperf/cph/results
-  awk '{print $12}' /tmp/mpstat | tail -6 |  awk '{total+=$1} END{printf "CPU=%0.2f\n",(NR?100-(total/NR):-1)}' >> /home/mqperf/cph/results
-  awk -F ',' '{print $7}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "Read=%0.2f\n",(NR?((total/NR)/(1024*1024)):-1)}' >> /home/mqperf/cph/results
-  awk -F ',' '{print $8}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "Write=%0.2f\n",(NR?((total/NR)/(1024*1024)):-1)}' >> /home/mqperf/cph/results
-  awk -F ',' '{print $9}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "Recv=%0.2f\n",(NR?((total/NR)/(1024*1024*1024*0.125)):-1)}' >> /home/mqperf/cph/results
-  awk -F ',' '{print $10}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "Send=%0.2f\n",(NR?((total/NR)/(1024*1024*1024*0.125)):-1)}' >> /home/mqperf/cph/results
-  tail -6 /tmp/systemerr | awk -F '=' '{print $2}' | awk '{total+=$1} END{printf "QM_CPU=%0.2f\n",(NR?(total/NR):-1)}' >> /home/mqperf/cph/results
+  rate=$(./cphreq.sh $threads $msgsize | tee -a /home/mqperf/cph/output | grep avgRate | awk -F ',' '{ print $3 }') 
+  rate=$(echo $rate | awk -F '=' '{print $2}')
+  echo "avgRate=$rate" >> /home/mqperf/cph/results
+
+  cpu=$(awk '{print $12}' /tmp/mpstat | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?100-(total/NR):-1)}') 
+  echo "CPU=$cpu" >> /home/mqperf/cph/results
+
+  readMB=$(awk -F ',' '{print $7}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024)):-1)}')
+  echo "Read=$readMB" >> /home/mqperf/cph/results
+
+  writeMB=$(awk -F ',' '{print $8}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024)):-1)}')
+  echo "Write=$writeMB" >> /home/mqperf/cph/results
+
+  recvGbs=$(awk -F ',' '{print $9}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024*1024*0.125)):-1)}')
+  echo "Recv=$recvGbs" >> /home/mqperf/cph/results
+
+  sendGbs=$(awk -F ',' '{print $10}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024*1024*0.125)):-1)}')
+  echo "Send=$sendGbs" >> /home/mqperf/cph/results
+
+  qmcpu=$(tail -6 /tmp/systemerr | awk -F '=' '{print $2}' | awk '{total+=$1} END{printf "%0.2f",(NR?(total/NR):-1)}')
+  echo "QM_CPU=$qmcpu" >> /home/mqperf/cph/results
+
   echo "" >> /home/mqperf/cph/results
+
+  if [ -n "${MQ_RESULTS_CSV}" ]; then
+    msgsize=${msgsize:-2048}
+    echo "$msgsize,$threads,$rate,$cpu,$readMB,$writeMB,$recvGbs,$sendGbs,$qmcpu" >> /home/mqperf/cph/results.csv
+  fi
 }
 
 echo "----------------------------------------"
