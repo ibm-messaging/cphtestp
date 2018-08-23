@@ -88,14 +88,14 @@ runclients 128
 runclients 200
 echo "----" >> /home/mqperf/cph/results
 echo $(date) >> /home/mqperf/cph/results
-echo "256b" >> /home/mqperf/cph/results
-runclients 1 256
-runclients 8 256
-runclients 16 256
-runclients 32 256
-runclients 64 256
-runclients 128 256
-runclients 200 256
+echo "20K" >> /home/mqperf/cph/results
+runclients 1 20480
+runclients 8 20480
+runclients 16 20480
+runclients 32 20480
+runclients 64 20480
+runclients 128 20480
+runclients 200 20480
 echo "----" >> /home/mqperf/cph/results
 echo $(date) >> /home/mqperf/cph/results
 echo "200K" >> /home/mqperf/cph/results
