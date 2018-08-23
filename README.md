@@ -44,6 +44,8 @@ In the latest release further configuration options have been added. The table b
 | MQ_USERID               | Userid to use when authenticating                    |                    |
 | MQ_PASSWORD             | Password to use when authenticating                  |                    |
 | MQ_CPH_EXTRA            | Additional string field to propogate to cph client   |                    |
+| MQ_RESULTS              | Log results to stdout at end of tests                | TRUE               |
+| MQ_RESULTS_CSV          | Log results to csv file and send to stdout at end    | FALSE              |
 
 
 
@@ -66,5 +68,5 @@ An interactive session with the running container can be access by:
 
 `docker -ti <containerID> /bin/bash`
 
-The version of cph contained in this image was taken on 28th November 2017 and built on 64bit xLinux. The most up to date cph code can be found here:
+The version of cph contained in this image was taken on 23rd Jan 2018 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
