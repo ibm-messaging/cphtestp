@@ -12,6 +12,9 @@ You will need to seperately download the MQ Client (for which license agreement 
 The MQ V9 client can be obtained from:
 http://www-01.ibm.com/support/docview.wss?uid=swg24042176
 
+The MQ V9.1 client can be obtained from:
+http://www-01.ibm.com/support/docview.wss?uid=swg24044791
+
 then perform a docker build as normal:
 
 `docker build --tag cphtestp .`
