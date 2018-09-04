@@ -68,5 +68,8 @@ An interactive session with the running container can be access by:
 
 `docker -ti <containerID> /bin/bash`
 
+
+Logging to a CSV output file is also supported by setting MQ_RESULTS_CSV to true, and the human readable output can be disabled by setting MQ_RESULTS=FALSE. The CSV output contains the date and time of the test, and field description header (both preceeded by #) before the CSV data.
+
 The version of cph contained in this image was taken on 23rd Jan 2018 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph

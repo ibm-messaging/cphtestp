@@ -37,7 +37,6 @@ function runclients {
 }
 
 
-
 echo "----------------------------------------"
 echo "Initialising test environment-----------"
 echo "----------------------------------------"
@@ -47,13 +46,14 @@ port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
 msgsize=${msgsize:-2048}
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
-if [ $nonpersistent eq 0 ]; then
-  persistent=1
-else
+
+if [ "${nonpersistent}" = "1" ]; then
   persistent=0
+else
+  persistent=1
 fi
  
-
+#Write results header
 echo $(date)
 echo $(date) > /home/mqperf/cph/results
 
@@ -74,6 +74,7 @@ if [ -n "${MQ_CPH_EXTRA}" ]; then
   echo "Extra CPH flags: ${MQ_CPH_EXTRA}" >> /home/mqperf/cph/results
 fi
 
+#Clear queues
 export MQSERVER="$channel/TCP/$host($port)";
 if [ -n "${MQ_USERID}" ]; then
   # Need to flow userid and password to runmqsc
@@ -101,7 +102,8 @@ fi
 #Write CSV header if required
 if [ -n "${MQ_RESULTS_CSV}" ]; then
   msgsize=${msgsize:-2048}
-  echo $(date) > /home/mqperf/cph/results.csv
+  printf "# " > /home/mqperf/cph/results.csv
+  echo $(date) >> /home/mqperf/cph/results.csv
   echo "# Persistence, Msg Size, Threads, Rate (RT/s), Client CPU, IO Read (MB/s), IO Write (MB/s), Net Recv (Gb/s), Net Send (Gb/s), QM CPU" >> /home/mqperf/cph/results.csv
 fi
 
@@ -144,7 +146,7 @@ runclients 128 204800
 runclients 200 204800
 echo "" >> /home/mqperf/cph/results
 
-if ! [ ${MQ_RESULTS} == "FALSE" ]; then
+if ! [ "${MQ_RESULTS}" = "FALSE" ]; then
   cat /home/mqperf/cph/results
 fi
 
