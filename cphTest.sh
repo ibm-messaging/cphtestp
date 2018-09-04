@@ -32,9 +32,11 @@ function runclients {
 
   if [ -n "${MQ_RESULTS_CSV}" ]; then
     msgsize=${msgsize:-2048}
-    echo "$msgsize,$threads,$rate,$cpu,$readMB,$writeMB,$recvGbs,$sendGbs,$qmcpu" >> /home/mqperf/cph/results.csv
+    echo "$persistent,$msgsize,$threads,$rate,$cpu,$readMB,$writeMB,$recvGbs,$sendGbs,$qmcpu" >> /home/mqperf/cph/results.csv
   fi
 }
+
+
 
 echo "----------------------------------------"
 echo "Initialising test environment-----------"
@@ -43,7 +45,14 @@ qmname="${MQ_QMGR_NAME:-PERF0}"
 host="${MQ_QMGR_HOSTNAME:-localhost}"
 port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
+msgsize=${msgsize:-2048}
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
+if [ $nonpersistent eq 0 ]; then
+  persistent=1
+else
+  persistent=0
+fi
+ 
 
 echo $(date)
 echo $(date) > /home/mqperf/cph/results
@@ -87,6 +96,13 @@ if [ -n "${MQ_USERID}" ]; then
 else
   ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary >/tmp/system 2>/tmp/systemerr &
   ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log >/tmp/disklog 2>/tmp/disklogerr &
+fi
+
+#Write CSV header if required
+if [ -n "${MQ_RESULTS_CSV}" ]; then
+  msgsize=${msgsize:-2048}
+  echo $(date) > /home/mqperf/cph/results.csv
+  echo "# Persistence, Msg Size, Threads, Rate (RT/s), Client CPU, IO Read (MB/s), IO Write (MB/s), Net Recv (Gb/s), Net Send (Gb/s), QM CPU" >> /home/mqperf/cph/results.csv
 fi
 
 
