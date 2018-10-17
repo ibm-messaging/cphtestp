@@ -70,7 +70,7 @@ Read=0.00
 Write=0.00
 Recv=0.06
 Send=0.05
-QM_CPU=2.70'
+QM_CPU=2.70
 ```
 and also of the MQ_RESULTS_CSV output:
 ```
@@ -94,7 +94,7 @@ An interactive session with the running container can be access by:
 
 Logging to a CSV output file is also supported by setting MQ_RESULTS_CSV to true, and the human readable output can be disabled by setting MQ_RESULTS=FALSE. The CSV output contains the date and time of the test, and field description header (both preceeded by #) before the CSV data.
 
-Support for TLS has now been added with the MQ_TLS_CIPHER parm, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
+Support for TLS has now been added with the MQ_TLS_CIPHER environment variable, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
 
 The version of cph contained in this image was taken on 23rd Jan 2018 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
