@@ -46,6 +46,8 @@ In the latest release further configuration options have been added. The table b
 | MQ_CPH_EXTRA            | Additional string field to propogate to cph client   |                    |
 | MQ_RESULTS              | Log results to stdout at end of tests                | TRUE               |
 | MQ_RESULTS_CSV          | Log results to csv file and send to stdout at end    | FALSE              |
+| MQ_TLS_CIPHER           | TLS CipherSpec to use                                |                    |
+| MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 
 
 
@@ -55,6 +57,27 @@ https://ibm-messaging.github.io/mqperf/
 When the testing is complete the final results will be posted to the docker logs and can be viewed in the normal way:
 
 `docker logs <containerID>`
+
+Here are some snippets of the human readable MQ_RESULTS:
+```
+CPH Test Results
+Tue Oct 16 15:48:22 UTC 2018
+2K
+threads=1
+avgRate=1150.56
+CPU=1.35
+Read=0.00
+Write=0.00
+Recv=0.06
+Send=0.05
+QM_CPU=2.70'
+```
+and also of the MQ_RESULTS_CSV output:
+```
+# Tue Oct 16 15:47:52 UTC 2018
+# Persistence, Msg Size, Threads, Rate (RT/s), Client CPU, IO Read (MB/s), IO Write (MB/s), Net Recv (Gb/s), Net Send (Gb/s), QM CPU
+1,2048,1,1150.56,1.35,0.00,0.00,0.06,0.05,2.70
+```
 
 You can also obtain the available results by:
 
@@ -70,6 +93,8 @@ An interactive session with the running container can be access by:
 
 
 Logging to a CSV output file is also supported by setting MQ_RESULTS_CSV to true, and the human readable output can be disabled by setting MQ_RESULTS=FALSE. The CSV output contains the date and time of the test, and field description header (both preceeded by #) before the CSV data.
+
+Support for TLS has now been added with the MQ_TLS_CIPHER parm, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
 
 The version of cph contained in this image was taken on 23rd Jan 2018 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
