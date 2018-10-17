@@ -36,6 +36,16 @@ function runclients {
   fi
 }
 
+function setupTLS {
+  #Assuming that key.kdb is already present in the default location /opt/mqm/ssl/key.kdb
+  #Assuming currently that kdb is CMS - Not tested yet with PKCS12
+
+  #Override mqclient.ini with SSL Key repository location and reuse count
+  cp /opt/mqm/ssl/mqclient.ini /var/mqm/mqclient.ini
+
+  #Create local CCDT; alternatives are to copy it from Server or host it at http location
+  echo "DEFINE CHANNEL('$channel') CHLTYPE(CLNTCONN) CONNAME('$host($port)') SSLCIPH(${MQ_SSL_CIPHER}) QMNAME($qmname) REPLACE" | /opt/mqm/bin/runmqsc -n
+}
 
 echo "----------------------------------------"
 echo "Initialising test environment-----------"
@@ -74,8 +84,23 @@ if [ -n "${MQ_CPH_EXTRA}" ]; then
   echo "Extra CPH flags: ${MQ_CPH_EXTRA}" >> /home/mqperf/cph/results
 fi
 
+if [ -n "${MQ_SSL_CIPHER}" ]; then
+  echo "SSL Cipher: ${MQ_SSL_CIPHER}"
+  echo "SSL Cipher: ${MQ_SSL_CIPHER}" >> /home/mqperf/cph/results
+  # Need to complete TLS setup before we try to attach monitors
+  setupTLS
+fi
+
 #Clear queues
-export MQSERVER="$channel/TCP/$host($port)";
+if [ -n "${MQ_SSL_CIPHER}" ]; then
+  #Dont configure MQSERVER envvar for TLS scenarios, will use CCDT
+  #We do need to specify the Key repository location as runmqsc doesnt use mqclient.ini
+  export MQSSLKEYR=/opt/mqm/ssl/key
+else
+  #Configure MQSERVER envvar
+  export MQSERVER="$channel/TCP/$host($port)";
+fi
+
 if [ -n "${MQ_USERID}" ]; then
   # Need to flow userid and password to runmqsc
   echo "Using userid: ${MQ_USERID}" 
@@ -92,11 +117,11 @@ fi
 mpstat 10 > /tmp/mpstat &
 dstat --output /tmp/dstat 10 > /dev/null 2>&1 &
 if [ -n "${MQ_USERID}" ]; then
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/system 2>/tmp/systemerr &
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/disklog 2>/tmp/disklogerr &
+  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_SSL_CIPHER} >/tmp/system 2>/tmp/systemerr &
+  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_SSL_CIPHER} >/tmp/disklog 2>/tmp/disklogerr &
 else
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary >/tmp/system 2>/tmp/systemerr &
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log >/tmp/disklog 2>/tmp/disklogerr &
+  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -l ${MQ_SSL_CIPHER} >/tmp/system 2>/tmp/systemerr &
+  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -l ${MQ_SSL_CIPHER} >/tmp/disklog 2>/tmp/disklogerr &
 fi
 
 #Write CSV header if required
@@ -111,7 +136,7 @@ fi
 echo "----------------------------------------"
 echo "Starting cph tests----------------------"
 echo "----------------------------------------"
-./cphresp.sh ${MQ_RESPONDER_THREADS} >> /home/mqperf/cph/output &
+./cphresp.sh ${MQ_RESPONDER_THREADS} >> /home/mqperf/cph/output & disown
 #Wait for responders to start
 sleep 30
 echo "CPH Test Results" >> /home/mqperf/cph/results
@@ -158,6 +183,10 @@ if [ -n "${MQ_DATA}" ]; then
   cat /tmp/system
   cat /tmp/disklog
   cat /home/mqperf/cph/output
+fi
+
+if [ -n "${MQ_ERRORS}" ]; then
+  cat /var/mqm/errors/AMQERR01.LOG
 fi
 
 echo "----------------------------------------"
