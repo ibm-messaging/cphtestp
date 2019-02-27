@@ -49,8 +49,6 @@ In the latest release further configuration options have been added. The table b
 | MQ_TLS_CIPHER           | TLS CipherSpec to use                                |                    |
 | MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 
-
-
 The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
 https://ibm-messaging.github.io/mqperf/
 
