@@ -13,3 +13,7 @@ mqlicense.sh
 #Ignore misc
 results
 /unzip*
+
+#Ignore keystores
+/ssl/*
+!/ssl/mqclient.ini
