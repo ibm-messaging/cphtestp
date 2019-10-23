@@ -66,6 +66,7 @@ port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
 msgsize=${msgsize:-2048}
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
+responders=${MQ_RESPONDER_THREADS:-200}"
 
 if [ "${nonpersistent}" = "1" ]; then
   persistent=0
@@ -147,11 +148,11 @@ fi
 echo "----------------------------------------"
 echo "Starting cph tests----------------------"
 echo "----------------------------------------"
-./cphresp.sh ${MQ_RESPONDER_THREADS} >> /home/mqperf/cph/output & disown
+./cphresp.sh ${responders} >> /home/mqperf/cph/output & disown
 #Wait for responders to start
 sleep 30
-#Determine sequence of requester clients to use
-getConcurrentClientsArray ${MQ_RESPONDER_THREADS}
+#Determine sequence of requester clients to use based of number of responder clients
+getConcurrentClientsArray ${responders}
 echo "Using the following progression of concurrent connections: ${clientsArray[@]}"
 echo "Using the following progression of concurrent connections: ${clientsArray[@]}" >> /home/mqperf/cph/results
 
