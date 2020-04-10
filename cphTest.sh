@@ -66,7 +66,7 @@ port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
 msgsize=${msgsize:-2048}
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
-responders=${MQ_RESPONDER_THREADS:-200}"
+responders="${MQ_RESPONDER_THREADS:-200}"
 
 if [ "${nonpersistent}" = "1" ]; then
   persistent=0
