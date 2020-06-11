@@ -7,6 +7,7 @@ You will need to seperately download the MQ Client (for which license agreement 
 * /lap/
 *  mqlicense.sh
 *  ibmmq-client_9.1.0.0_amd64.deb
+*  ibmmq-gskit_9.1.0.0_amd64.deb
 *  ibmmq-runtime_9.1.0.0_amd64.deb
 
 The MQ V9 client can be obtained from:
