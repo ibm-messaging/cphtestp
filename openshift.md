@@ -9,7 +9,8 @@ docker build --tag chptestp .
 
 ## Creating the project/namespace and pushing images to the image registry
 The first step to deploying an MQ client is to create the project/namespace. Use the same project/namespace that you used for the MQ deployment, or create as follows if MQ QM is yet to be deployed (and reuse when deploying MQ QM).
-```oc new-project mqns
+```
+oc new-project mqns
 ```
 If your test image is in your local repository, you will need to first log into the default image registry in OCP before you can upload your test image.
 ``` 
@@ -19,7 +20,7 @@ docker push default-route-openshift-image-registry.apps.<hostname>/mqns/cphtestp
 ```
 If you encounter some errors with pushing your image, check the process described on the [jmstestp](https://github.com/ibm-messaging/jmstestp/blob/master/openshift.md) instructions for further help.
 You can check that the images are loaded within the correct project/namespace, by going to OpenShift UI -> Build -> Images
-```
+
 You can use OpenShift to create default resources directly from the supplied image, but for this demonstration we are going to look 
 at using some pre-existing yaml to assist with deploying the cphtestp client application.
 
