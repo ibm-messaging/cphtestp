@@ -27,7 +27,7 @@ at using some pre-existing yaml to assist with deploying the cphtestp client app
 ## Grant SCC permissions
 If you tried running an instance of your application, it would likely fail as the client attempts to write to some temporary storage associated 
 with the lifetime of the pod. Since this pod is only used for testing purposes the easiest way to resolve this issue is to grant the
-OpenShift permission for the pod to run with its preferred user as follows;
+OpenShift permission for the pod to run with its preferred user as follows:
 ```
 oc adm policy add-scc-to-user anyuid -z default
 ```
