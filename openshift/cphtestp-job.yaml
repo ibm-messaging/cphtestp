@@ -1,0 +1,66 @@
+apiVersion: batch/v1 
+kind: Job
+metadata:
+  labels:
+    run: cphtestp
+  name: cphtestp
+  namespace: mqns
+spec:
+  template:
+    metadata:
+      labels:
+        run: cphtestp
+      annotations:
+        k8s.v1.cni.cncf.io/networks: mqns/tengig
+    spec:
+      containers:
+      - env:
+        - name: LICENSE
+          value: accept
+        - name: MQ_QMGR_HOSTNAME
+          value: 172.xx.yy.zz
+        - name: MQ_QMGR_PORT
+          value: "1414"
+        - name: MQ_USERID
+          value: 
+        - name: MQ_PASSWORD
+          value: 
+        - name: MQ_QMGR_CHANNEL
+          value: SYSTEM.DEF.SVRCONN
+        - name: MQ_RESPONDER_THREADS
+          value: "500"
+        - name: MQ_NON_PERSISTENT
+          value: "0"
+        - name: MQ_QMGR_NAME
+          value: PERF0
+        - name: MQ_DATA
+          value: 
+        - name: MQ_RESULTS_CSV
+          value: "true"
+        - name: MQ_RESULTS
+          value: "false"
+        image: image-registry.openshift-image-registry.svc:5000/mqns/cphtestp
+#        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
+        name: cphtestp
+        resources: 
+          requests:
+            memory: "16Gi"
+            cpu: "8"
+          limits:
+            memory: "16Gi"
+            cpu: "32"
+        terminationMessagePath: /dev/termination-log
+        volumeMounts:
+          - name: cphdata
+            mountPath: /var/cph
+      dnsPolicy: ClusterFirst
+      restartPolicy: OnFailure
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: cphdata
+        emptyDir: {}
+      nodeSelector: 
+        kubernetes.io/hostname : worker5.<hostname>
+        
