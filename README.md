@@ -31,7 +31,7 @@ The default configuration looks for a QM located on the localhost called PERF0 w
 In addition to the hostname, port and and QM name, the default channel can be overidden using the MQ_QMGR_CHANNEL envvar and the queue prefixes used for the testing can be set using MQ_QMGR_QREQUEST_PREFIX and MQ_QMGR_QREPLY_PREFIX.
 
 ## Running inside Red Hat OpenShift Container Platform (OCP)
-You can also run this performance harness inside Red Hat OpenShift using the [OpenShift instructions](openshift.md).
+You can also run this performance harness inside Red Hat OpenShift using the [OpenShift instructions](openshift/openshift.md).
 
 ## Setting configuration options
 In the latest release further configuration options have been added. The table below provides the full set:
