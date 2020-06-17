@@ -1,4 +1,4 @@
-# Running the performance framework inside Red Hat OpenShift Container Platform (OCP)
+# Running the cphtestp performance tests inside Red Hat OpenShift Container Platform (OCP)
 The following instructions describe how to run the IBM MQ CPH performance harness inside an
 OpenShift Container Platform (OCP) cluster. 
 
