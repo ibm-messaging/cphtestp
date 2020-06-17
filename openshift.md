@@ -35,7 +35,7 @@ oc adm policy add-scc-to-user anyuid -z default
 ## Configure the environment properties
 We can use a single yaml file to configure and deploy an instance of our MQ application to execute as a Kubernetes Job
 
-Review the cphtestp-job.yaml and define at least the MQ_QMGR_HOSTNAME, MQ_QMGR_NAME and MQ_QMGR_PORT values.
+Review the cphtestp-job.yaml and define at least the MQ_QMGR_HOSTNAME, MQ_QMGR_NAME and MQ_QMGR_PORT values as well as the location from which to pull the image.
 
 Optionally you may also wish to set any other properties as described in the [README](README.md#setting-configuration-options)
 such as `MQ_RESPONDER_THREADS` (to restrict the number of threads used), `MQ_QMGR_CHANNEL` to set the channel name,
