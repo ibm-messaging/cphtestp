@@ -50,7 +50,13 @@ You can then check that the client pod has been created and the job is running:
 oc get pods
 oc get jobs
 ```
-When the job is finished, you can obtain the results by viewing the pod logs. Deleting the job will also delete the associated pod and its results.
+If you want to view the status of the client whilst its running, you can use either `kubectl exec` or `oc exec` to attach a terminal to the running pod:
+```
+oc exec -ti cphtestp-kwkvv bash
+cat output | more
+cat results.csv
+```
+When the job is finished, you can obtain the results by viewing the pod logs `oc logs <cphtestp pod>`. Deleting the job will also delete the associated pod and its results.
 
 ## Congratulations!
 You have successfully configured the IBM CPH performance test harness to run in a Red Hat
