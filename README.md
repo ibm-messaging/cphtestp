@@ -1,5 +1,5 @@
 # cphtestp
-Environment for creating a docker image running cph performance tests for Persistent and Non Persistent messaging.
+Environment for creating a docker image running cph performance tests for Persistent and Non Persistent MQ messaging.
 
 This repository contains a set of files to help create a Docker image containing the CPH executable and a set of scripts to run an inital set of performance tests.
 
@@ -15,6 +15,9 @@ http://www-01.ibm.com/support/docview.wss?uid=swg24042176
 
 The MQ V9.1 client can be obtained from:
 http://www-01.ibm.com/support/docview.wss?uid=swg24044791
+
+The MQ V9.2 client can be obtained from:
+https://ibm.biz/mq92clients
 
 then perform a docker build as normal:
 
