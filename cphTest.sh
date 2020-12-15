@@ -54,7 +54,11 @@ function setupTLS {
   cp /opt/mqm/ssl/mqclient.ini /var/mqm/mqclient.ini
 
   #Create local CCDT; alternatives are to copy it from Server or host it at http location
-  echo "DEFINE CHANNEL('$channel') CHLTYPE(CLNTCONN) CONNAME('$host($port)') SSLCIPH(${MQ_TLS_CIPHER}) QMNAME($qmname) REPLACE" | /opt/mqm/bin/runmqsc -n
+  echo "DEFINE CHANNEL('$channel') CHLTYPE(CLNTCONN) CONNAME('$host($port)') SSLCIPH(${MQ_TLS_CIPHER}) QMNAME('$qmname') CERTLABL('${MQ_TLS_CERTLABEL}') REPLACE" | /opt/mqm/bin/runmqsc -n > /home/mqperf/cph/output 2>&1
+
+  #Add certificate label to the mqclient.ini if we are flowing a client cert; adding it the local channel definition above will work in most cases if no CD is flowed from the application
+  #Support added to cph for specifying certlabel with -jw parm  
+  #echo "  CertificateLabel=${MQ_TLS_CERTLABEL}" >> /var/mqm/mqclient.ini
 }
 
 echo "----------------------------------------"
@@ -109,19 +113,19 @@ if [ -n "${MQ_TLS_CIPHER}" ]; then
   export MQSSLKEYR=/opt/mqm/ssl/key
 else
   #Configure MQSERVER envvar
-  export MQSERVER="$channel/TCP/$host($port)";
+  export MQSERVER="$channel/TCP/$host($port)"
 fi
 
 if [ -n "${MQ_USERID}" ]; then
   # Need to flow userid and password to runmqsc
   echo "Using userid: ${MQ_USERID}" 
   echo "Using userid: ${MQ_USERID}" >> /home/mqperf/cph/results
-  echo ${MQ_PASSWORD} > /tmp/clearq.mqsc;
-  cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc;  
-  cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output;
-  rm -f /tmp/clearq.mqsc;
+  echo ${MQ_PASSWORD} > /tmp/clearq.mqsc
+  cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc  
+  cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output 2>&1
+  rm -f /tmp/clearq.mqsc
 else
-  cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c $qmname > /home/mqperf/cph/output 2>&1;
+  cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c $qmname > /home/mqperf/cph/output 2>&1
 fi
 
 #Launch monitoring processes
