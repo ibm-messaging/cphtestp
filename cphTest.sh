@@ -79,29 +79,33 @@ else
 fi
  
 #Write results header
-echo $(date)
-echo $(date) > /home/mqperf/cph/results
+echo $(date) | tee /home/mqperf/cph/results
 
 if [ "${nonpersistent}" -eq 1 ]; then
-  echo "Running Non Persistent Messaging Tests"
-  echo "Running Non Persistent Messaging Tests" >> /home/mqperf/cph/results
+  echo "Running Non Persistent Messaging Tests" | tee -a /home/mqperf/cph/results
 else
-  echo "Running Persistent Messaging Tests"
-  echo "Running Persistent Messaging Tests" >> /home/mqperf/cph/results
+  echo "Running Persistent Messaging Tests" | tee -a /home/mqperf/cph/results
 fi
 echo "----------------------------------------"
 
-echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" 
-echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" >> /home/mqperf/cph/results
+echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" | tee -a /home/mqperf/cph/results
+
+#Temp check to kill pod if same IP address assigned to test harness than that used for QM
+#OCP/multus doesnt track issued IPs in 4.2
+if [ -n "${MQ_IP_CHECK}" ]; then
+  ipclash=`ip a | grep ${MQ_QMGR_HOSTNAME} | awk '{print $2}'`
+  if [ -n "${ipclash}" ]; then
+    echo "IP Assigned to QM is the same as assigned to test harness: $ipclash" 
+    exit
+  fi
+fi
 
 if [ -n "${MQ_CPH_EXTRA}" ]; then
-  echo "Extra CPH flags: ${MQ_CPH_EXTRA}" 
-  echo "Extra CPH flags: ${MQ_CPH_EXTRA}" >> /home/mqperf/cph/results
+  echo "Extra CPH flags: ${MQ_CPH_EXTRA}" | tee -a /home/mqperf/cph/results
 fi
 
 if [ -n "${MQ_TLS_CIPHER}" ]; then
-  echo "TLS Cipher: ${MQ_TLS_CIPHER}"
-  echo "TLS Cipher: ${MQ_TLS_CIPHER}" >> /home/mqperf/cph/results
+  echo "TLS Cipher: ${MQ_TLS_CIPHER}" | tee -a /home/mqperf/cph/results
   # Need to complete TLS setup before we try to attach monitors
   setupTLS
 fi
@@ -118,8 +122,7 @@ fi
 
 if [ -n "${MQ_USERID}" ]; then
   # Need to flow userid and password to runmqsc
-  echo "Using userid: ${MQ_USERID}" 
-  echo "Using userid: ${MQ_USERID}" >> /home/mqperf/cph/results
+  echo "Using userid: ${MQ_USERID}" | tee -a /home/mqperf/cph/results
   echo ${MQ_PASSWORD} > /tmp/clearq.mqsc
   cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc  
   cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output 2>&1
@@ -132,17 +135,28 @@ fi
 mpstat 10 > /tmp/mpstat &
 dstat --output /tmp/dstat 10 > /dev/null 2>&1 &
 if [ -n "${MQ_USERID}" ]; then
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} >/tmp/system 2>/tmp/systemerr &
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} >/tmp/disklog 2>/tmp/disklogerr &
+  if [ -n "${MQ_TLS_CIPHER}" ]; then
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
+  else
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/system 2>/tmp/systemerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/disklog 2>/tmp/disklogerr &
+  fi
 else
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -l ${MQ_TLS_CIPHER} >/tmp/system 2>/tmp/systemerr &
-  ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -l ${MQ_TLS_CIPHER} >/tmp/disklog 2>/tmp/disklogerr &
+  if [ -n "${MQ_TLS_CIPHER}" ]; then
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
+  else
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary >/tmp/system 2>/tmp/systemerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log >/tmp/disklog 2>/tmp/disklogerr &
+  fi
 fi
 
 #Write CSV header if required
 if [ -n "${MQ_RESULTS_CSV}" ]; then
   msgsize=${msgsize:-2048}
   echo "# CSV Results" > /home/mqperf/cph/results.csv
+  echo "# TLS Cipher: ${MQ_TLS_CIPHER}" >> /home/mqperf/cph/results.csv
   printf "# " >> /home/mqperf/cph/results.csv
   echo $(date) >> /home/mqperf/cph/results.csv
   echo "# Persistence, Msg Size, Threads, Rate (RT/s), Client CPU, IO Read (MB/s), IO Write (MB/s), Net Recv (Gb/s), Net Send (Gb/s), QM CPU" >> /home/mqperf/cph/results.csv
@@ -157,8 +171,7 @@ echo "----------------------------------------"
 sleep 30
 #Determine sequence of requester clients to use based of number of responder clients
 getConcurrentClientsArray ${responders}
-echo "Using the following progression of concurrent connections: ${clientsArray[@]}"
-echo "Using the following progression of concurrent connections: ${clientsArray[@]}" >> /home/mqperf/cph/results
+echo "Using the following progression of concurrent connections: ${clientsArray[@]}" | tee -a /home/mqperf/cph/results
 
 echo "CPH Test Results" >> /home/mqperf/cph/results
 echo $(date) >> /home/mqperf/cph/results
