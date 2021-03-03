@@ -55,6 +55,7 @@ In the latest release further configuration options have been added. The table b
 | MQ_RESULTS              | Log results to stdout at end of tests                | TRUE               |
 | MQ_RESULTS_CSV          | Log results to csv file and send to stdout at end    | FALSE              |
 | MQ_TLS_CIPHER           | TLS CipherSpec to use                                |                    |
+| MQ_TLS_CERTLABEL        | TLS Certificate Label to use for the client          |                    |
 | MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 
 The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
@@ -100,7 +101,9 @@ An interactive session with the running container can be access by:
 
 Logging to a CSV output file is also supported by setting MQ_RESULTS_CSV to true, and the human readable output can be disabled by setting MQ_RESULTS=FALSE. The CSV output contains the date and time of the test, and field description header (both preceeded by #) before the CSV data.
 
-Support for TLS has now been added with the MQ_TLS_CIPHER environment variable, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
+Support for TLS has now been added with the MQ_TLS_CIPHER environment variable, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match/work with the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
 
-The version of cph contained in this image was taken on 23rd Jan 2018 and built on 64bit xLinux. The most up to date cph code can be found here:
+You can also specify the Certificate Label that the cph client will use, so that mutual authentication takes place. If you leave blank, then just QM authentication will be used; in which case make sure your server channel definition specifies SSLCAUTH(OPTIONAL) and not SSLCAUTH(REQUIRED).
+
+The version of cph contained in this image was taken on 15th Dec 2020 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
