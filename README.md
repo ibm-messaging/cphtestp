@@ -56,6 +56,7 @@ In the latest release further configuration options have been added. The table b
 | MQ_RESULTS_CSV          | Log results to csv file and send to stdout at end    | FALSE              |
 | MQ_TLS_CIPHER           | TLS CipherSpec to use                                |                    |
 | MQ_TLS_CERTLABEL        | TLS Certificate Label to use for the client          |                    |
+| MQ_TLS_SNI_HOSTNAME     | Use TLS SNI field to indicate target host            | FALSE              |
 | MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 
 The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
