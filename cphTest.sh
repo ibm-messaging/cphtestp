@@ -52,6 +52,10 @@ function setupTLS {
 
   #Override mqclient.ini with SSL Key repository location and reuse count
   cp /opt/mqm/ssl/mqclient.ini /var/mqm/mqclient.ini
+  
+  if [[ -n "${MQ_TLS_SNI_HOSTNAME}" ]]; then
+    echo "  OutboundSNI=HOSTNAME" >> /var/mqm/mqclient.ini
+  fi
 
   #Create local CCDT; alternatives are to copy it from Server or host it at http location
   echo "DEFINE CHANNEL('$channel') CHLTYPE(CLNTCONN) CONNAME('$host($port)') SSLCIPH(${MQ_TLS_CIPHER}) QMNAME('$qmname') CERTLABL('${MQ_TLS_CERTLABEL}') REPLACE" | /opt/mqm/bin/runmqsc -n > /home/mqperf/cph/output 2>&1
