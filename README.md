@@ -6,9 +6,9 @@ This repository contains a set of files to help create a Docker image containing
 You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your docker image:
 * /lap/
 *  mqlicense.sh
-*  ibmmq-client_9.1.0.0_amd64.deb
-*  ibmmq-gskit_9.1.0.0_amd64.deb
-*  ibmmq-runtime_9.1.0.0_amd64.deb
+*  ibmmq-client_9.x.x.x_amd64.deb
+*  ibmmq-gskit_9.x.x.x_amd64.deb
+*  ibmmq-runtime_9.x.x.x_amd64.deb
 
 The MQ V9 client can be obtained from:
 http://www-01.ibm.com/support/docview.wss?uid=swg24042176
@@ -19,7 +19,7 @@ http://www-01.ibm.com/support/docview.wss?uid=swg24044791
 The MQ V9.2 client can be obtained from:
 https://ibm.biz/mq92clients
 
-then perform a docker build as normal:
+The Dockerfile will need to be edited to refer to the client version you have downloaded, then perform a docker build as normal:
 
 `docker build --tag cphtestp .`
 
@@ -106,5 +106,7 @@ Support for TLS has now been added with the MQ_TLS_CIPHER environment variable, 
 
 You can also specify the Certificate Label that the cph client will use, so that mutual authentication takes place. If you leave blank, then just QM authentication will be used; in which case make sure your server channel definition specifies SSLCAUTH(OPTIONAL) and not SSLCAUTH(REQUIRED).
 
-The version of cph contained in this image was taken on 15th Dec 2020 and built on 64bit xLinux. The most up to date cph code can be found here:
+The use of the MQ_TLS_SNI_HOSTNAME environment variable only works with MQ clients 9.2.1 or newer.
+
+The version of cph contained in this image was taken on 9th June 2021 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
