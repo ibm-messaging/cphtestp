@@ -59,8 +59,11 @@ In the latest release further configuration options have been added. The table b
 | MQ_TLS_SNI_HOSTNAME     | Use TLS SNI field to indicate target host            | FALSE              |
 | MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 
+## Test results
 The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
 https://ibm-messaging.github.io/mqperf/
+
+To ensure the timestamps created when testing match those of your hostmachines, you can edit `/usr/share/containers/containers.conf` and set `tz=local` to ensure that the container runs within the same timezone as that of the hostmachine.
 
 When the testing is complete the final results will be posted to the docker logs and can be viewed in the normal way:
 
@@ -102,11 +105,14 @@ An interactive session with the running container can be access by:
 
 Logging to a CSV output file is also supported by setting MQ_RESULTS_CSV to true, and the human readable output can be disabled by setting MQ_RESULTS=FALSE. The CSV output contains the date and time of the test, and field description header (both preceeded by #) before the CSV data.
 
+
+## TLS support
 Support for TLS has now been added with the MQ_TLS_CIPHER environment variable, from which a new CCDT will be created for the MQ client to use. Set the CipherSpec to match/work with the CipherSpec defined at the QM. You will need to place a CMS keystore named key.kdb(and its stash file) containing your QM public certificate in the /ssl directory. 
 
 You can also specify the Certificate Label that the cph client will use, so that mutual authentication takes place. If you leave blank, then just QM authentication will be used; in which case make sure your server channel definition specifies SSLCAUTH(OPTIONAL) and not SSLCAUTH(REQUIRED).
 
 The use of the MQ_TLS_SNI_HOSTNAME environment variable only works with MQ clients 9.2.1 or newer.
 
+## Embedded cph
 The version of cph contained in this image was taken on 9th June 2021 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
