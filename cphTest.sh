@@ -206,10 +206,6 @@ if ! [ "${MQ_RESULTS}" = "FALSE" ]; then
   cat /home/mqperf/cph/results
 fi
 
-if [ -n "${MQ_RESULTS_CSV}" ]; then
-  cat /home/mqperf/cph/results.csv
-fi
-
 if [ -n "${MQ_DATA}" ]; then
   cat /tmp/system
   cat /tmp/disklog
@@ -218,6 +214,10 @@ fi
 
 if [ -n "${MQ_ERRORS}" ]; then
   cat /var/mqm/errors/AMQERR01.LOG
+fi
+
+if [ -n "${MQ_RESULTS_CSV}" ]; then
+  cat /home/mqperf/cph/results.csv
 fi
 
 echo "----------------------------------------"
