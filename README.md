@@ -113,6 +113,9 @@ You can also specify the Certificate Label that the cph client will use, so that
 
 The use of the MQ_TLS_SNI_HOSTNAME environment variable only works with MQ clients 9.2.1 or newer.
 
+## Max PIDS
+Depending on the container runtime environment you are using, if you have problems creating enough application (and MQ client threads) in the cphtestp container, you may need to increase the PID limit. This can be configured on the `docker/podman run --pids-limit=8192 cphtestp` or more permanently in the `/usr/share/containers/containers.conf` file.
+
 ## Embedded cph
 The version of cph contained in this image was taken on 9th June 2021 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
