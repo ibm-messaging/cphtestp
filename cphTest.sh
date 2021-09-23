@@ -38,7 +38,7 @@ function runclients {
 
 function getConcurrentClientsArray {
   maximumClients=$1
-  maximumClients=`expr ${maximumClients} - 2`
+  #maximumClients=`expr ${maximumClients} - 2`
   for (( i=1; i<$maximumClients; i=$i*2 ))
   do
     clientsArray+=($i)
@@ -142,17 +142,21 @@ if [ -n "${MQ_USERID}" ]; then
   if [ -n "${MQ_TLS_CIPHER}" ]; then
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhalog 2>/tmp/nhalogerr &
   else
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/disklog 2>/tmp/disklogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/nhalog 2>/tmp/nhalogerr &
   fi
 else
   if [ -n "${MQ_TLS_CIPHER}" ]; then
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhalog 2>/tmp/nhalogerr &
   else
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log >/tmp/disklog 2>/tmp/disklogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + >/tmp/nhalog 2>/tmp/nhalogerr &
   fi
 fi
 
@@ -209,6 +213,7 @@ fi
 if [ -n "${MQ_DATA}" ]; then
   cat /tmp/system
   cat /tmp/disklog
+  cat /tmp/nhalog
   cat /home/mqperf/cph/output
 fi
 

@@ -67,9 +67,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.2.2.0_amd64.deb \
-  && dpkg -i ibmmq-gskit_9.2.2.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.2.2.0_amd64.deb 
+  && dpkg -i ibmmq-runtime_9.2.3.0_amd64.deb \
+  && dpkg -i ibmmq-gskit_9.2.3.0_amd64.deb \
+  && dpkg -i ibmmq-client_9.2.3.0_amd64.deb 
 
 COPY cph/* /home/mqperf/cph/
 COPY ssl/* /opt/mqm/ssl/
