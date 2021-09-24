@@ -180,6 +180,7 @@ sleep 30
 #Determine sequence of requester clients to use based of number of responder clients
 getConcurrentClientsArray ${responders}
 echo "Using the following progression of concurrent connections: ${clientsArray[@]}" | tee -a /home/mqperf/cph/results
+echo "Using ${responders} responder threads" | tee -a /home/mqperf/cph/results
 
 echo "CPH Test Results" >> /home/mqperf/cph/results
 echo $(date) >> /home/mqperf/cph/results
