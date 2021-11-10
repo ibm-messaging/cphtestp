@@ -31,7 +31,6 @@ function runclients {
   echo "" >> /home/mqperf/cph/results
 
   if [ -n "${MQ_RESULTS_CSV}" ]; then
-    msgsize=${msgsize:-2048}
     echo "$persistent,$msgsize,$threads,$rate,$cpu,$readMB,$writeMB,$recvGbs,$sendGbs,$qmcpu" >> /home/mqperf/cph/results.csv
   fi
 }
@@ -72,16 +71,17 @@ qmname="${MQ_QMGR_NAME:-PERF0}"
 host="${MQ_QMGR_HOSTNAME:-localhost}"
 port="${MQ_QMGR_PORT:-1420}"
 channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
-msgsize=${msgsize:-2048}
+msgsizestring="${MQ_MSGSIZE:-2048:20480:204800}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 responders="${MQ_RESPONDER_THREADS:-200}"
+IFS=:
 
 if [ "${nonpersistent}" = "1" ]; then
   persistent=0
 else
   persistent=1
 fi
- 
+
 #Write results header
 echo $(date) | tee /home/mqperf/cph/results
 
@@ -93,6 +93,11 @@ fi
 echo "----------------------------------------"
 
 echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" | tee -a /home/mqperf/cph/results
+
+echo "Using the following message sizes:" | tee -a /home/mqperf/cph/results
+for messageSize in ${msgsizestring}; do
+  echo "$messageSize" | tee -a /home/mqperf/cph/results 
+done
 
 #Temp check to kill pod if same IP address assigned to test harness than that used for QM
 #OCP/multus doesnt track issued IPs in 4.2
@@ -162,7 +167,6 @@ fi
 
 #Write CSV header if required
 if [ -n "${MQ_RESULTS_CSV}" ]; then
-  msgsize=${msgsize:-2048}
   echo "# CSV Results" > /home/mqperf/cph/results.csv
   echo "# TLS Cipher: ${MQ_TLS_CIPHER}" >> /home/mqperf/cph/results.csv
   printf "# " >> /home/mqperf/cph/results.csv
@@ -183,35 +187,20 @@ echo "Using the following progression of concurrent connections: ${clientsArray[
 echo "Using ${responders} responder threads" | tee -a /home/mqperf/cph/results
 
 echo "CPH Test Results" >> /home/mqperf/cph/results
-echo $(date) >> /home/mqperf/cph/results
-echo "2K" >> /home/mqperf/cph/results
-for concurrentConnections in ${clientsArray[@]}
-do
-  runclients $concurrentConnections 2048
+for messageSize in ${msgsizestring}; do
+  echo $(date) >> /home/mqperf/cph/results
+  echo "$messageSize" >> /home/mqperf/cph/results
+  for concurrentConnections in ${clientsArray[@]}
+  do
+    runclients $concurrentConnections $messageSize
+  done
 done
-
-echo "----" >> /home/mqperf/cph/results
-echo $(date) >> /home/mqperf/cph/results
-echo "20K" >> /home/mqperf/cph/results
-for concurrentConnections in ${clientsArray[@]}
-do
-  runclients $concurrentConnections 20480
-done
-
-echo "----" >> /home/mqperf/cph/results
-echo $(date) >> /home/mqperf/cph/results
-echo "200K" >> /home/mqperf/cph/results
-for concurrentConnections in ${clientsArray[@]}
-do
-  runclients $concurrentConnections 204800
-done
-echo "" >> /home/mqperf/cph/results
 
 if ! [ "${MQ_RESULTS}" = "FALSE" ]; then
   cat /home/mqperf/cph/results
 fi
 
-if [ -n "${MQ_DATA}" ]; then
+if [ -n "${MQ_DATA}" ] && [ ${MQ_DATA} -eq 1 ]; then
   cat /tmp/system
   cat /tmp/disklog
   cat /tmp/nhalog
