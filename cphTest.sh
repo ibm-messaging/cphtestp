@@ -36,13 +36,17 @@ function runclients {
 }
 
 function getConcurrentClientsArray {
-  maximumClients=$1
-  #maximumClients=`expr ${maximumClients} - 2`
-  for (( i=1; i<$maximumClients; i=$i*2 ))
-  do
-    clientsArray+=($i)
-  done
-  clientsArray+=($maximumClients)
+  if  ! [ -z "{MQ_FIXED_CLIENTS}" ]; then
+    clientsArray=(${MQ_FIXED_CLIENTS})
+  else
+    maximumClients=$1
+    #maximumClients=`expr ${maximumClients} - 2`
+    for (( i=1; i<$maximumClients; i=$i*2 ))
+    do
+      clientsArray+=($i)
+    done
+    clientsArray+=($maximumClients)
+  fi
 }
 
 function setupTLS {
@@ -74,7 +78,7 @@ channel="${MQ_QMGR_CHANNEL:-SYSTEM.DEF.SVRCONN}"
 msgsizestring="${MQ_MSGSIZE:-2048:20480:204800}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 responders="${MQ_RESPONDER_THREADS:-200}"
-IFS=:
+
 
 if [ "${nonpersistent}" = "1" ]; then
   persistent=0
@@ -129,15 +133,18 @@ else
   export MQSERVER="$channel/TCP/$host($port)"
 fi
 
-if [ -n "${MQ_USERID}" ]; then
-  # Need to flow userid and password to runmqsc
-  echo "Using userid: ${MQ_USERID}" | tee -a /home/mqperf/cph/results
-  echo ${MQ_PASSWORD} > /tmp/clearq.mqsc
-  cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc  
-  cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output 2>&1
-  rm -f /tmp/clearq.mqsc
-else
-  cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c $qmname > /home/mqperf/cph/output 2>&1
+#Only avoid clearing queues if parm is defined and set to N
+if ! ( [ -n "{MQ_CLEAR_QUEUES}" ] && [ "${MQ_CLEAR_QUEUES}" = "N" ] ); then
+  if [ -n "${MQ_USERID}" ]; then
+    # Need to flow userid and password to runmqsc
+    echo "Using userid: ${MQ_USERID}" | tee -a /home/mqperf/cph/results
+    echo ${MQ_PASSWORD} > /tmp/clearq.mqsc
+    cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc  
+    cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output 2>&1
+    rm -f /tmp/clearq.mqsc
+  else
+    cat /home/mqperf/cph/clearq.mqsc | /opt/mqm/bin/runmqsc -c $qmname > /home/mqperf/cph/output 2>&1
+  fi
 fi
 
 #Launch monitoring processes
@@ -186,15 +193,19 @@ getConcurrentClientsArray ${responders}
 echo "Using the following progression of concurrent connections: ${clientsArray[@]}" | tee -a /home/mqperf/cph/results
 echo "Using ${responders} responder threads" | tee -a /home/mqperf/cph/results
 
+IFS=:
 echo "CPH Test Results" >> /home/mqperf/cph/results
 for messageSize in ${msgsizestring}; do
+  unset IFS
   echo $(date) >> /home/mqperf/cph/results
+  IFS=:
   echo "$messageSize" >> /home/mqperf/cph/results
   for concurrentConnections in ${clientsArray[@]}
   do
     runclients $concurrentConnections $messageSize
   done
 done
+unset IFS
 
 if ! [ "${MQ_RESULTS}" = "FALSE" ]; then
   cat /home/mqperf/cph/results
