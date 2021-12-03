@@ -36,7 +36,7 @@ function runclients {
 }
 
 function getConcurrentClientsArray {
-  if  ! [ -z "{MQ_FIXED_CLIENTS}" ]; then
+  if  ! [ -z "${MQ_FIXED_CLIENTS}" ]; then
     clientsArray=(${MQ_FIXED_CLIENTS})
   else
     maximumClients=$1
