@@ -14,6 +14,8 @@ userid="${MQ_USERID}"
 password="${MQ_PASSWORD}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 runlength="${MQ_RUNLENGTH:-90}"
+reconnect="${MQ_AUTORECONNECT:-MQCNO_RECONNECT_DISABLED}"
+
 
 if [ "${nonpersistent}" -eq 1 ]; then
   persistent_flags="-tx false -pp false"
@@ -23,7 +25,7 @@ fi
 
 
 if [ -n "${MQ_USERID}" ]; then
-  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -us $userid -pw $password $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL}
+  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect -us $userid -pw $password $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL}
 else
-  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL}
+  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL}
 fi
