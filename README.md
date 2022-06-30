@@ -63,8 +63,10 @@ In the latest release further configuration options have been added. The table b
 | MQ_AUTORECONNECT        | MQ Auto reconnection option                          | 
 
 ## Test results
-The container will run a number of tests using different numbers of threads with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
+The container will run a number of tests using different numbers of requester threads(incrementing in powers of 2) with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
 https://ibm-messaging.github.io/mqperf/
+
+The final iteration will be with requester threads equal to the responder threads, thus you can control the scope of the testing by just setting the MQ_RESPONDER_THREADS envvar.
 
 To ensure the timestamps created when testing match those of your hostmachines, you can edit `/usr/share/containers/containers.conf` and set `tz=local` to ensure that the container runs within the same timezone as that of the hostmachine.
 
