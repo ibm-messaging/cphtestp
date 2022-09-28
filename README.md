@@ -21,7 +21,8 @@ https://ibm.biz/mq92clients
 
 The MQ V9.3 client can be obtained from:
 https://ibm.biz/mq93clients
-Filter to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
+
+For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
 
 The Dockerfile will need to be edited to refer to the client version you have downloaded, then perform a docker build as normal:
 
