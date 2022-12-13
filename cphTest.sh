@@ -217,6 +217,7 @@ if [ -n "${MQ_DATA}" ] && [ ${MQ_DATA} -eq 1 ]; then
   cat /tmp/disklog
   cat /tmp/nhalog
   cat /home/mqperf/cph/output
+  env
 fi
 
 if [ -n "${MQ_ERRORS}" ]; then
@@ -228,5 +229,5 @@ if [ -n "${MQ_RESULTS_CSV}" ]; then
 fi
 
 echo "----------------------------------------"
-echo "cph testing finished--------------------"
+echo "cph testing finished: $(date)"
 echo "----------------------------------------"
