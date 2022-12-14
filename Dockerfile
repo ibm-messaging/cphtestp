@@ -60,16 +60,19 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   && sed -i 's/password\t\[success=1 default=ignore\]\tpam_unix\.so obscure sha512/password\t[success=1 default=ignore]\tpam_unix.so obscure sha512 minlen=8/' /etc/pam.d/common-password \
   && groupadd --system --gid 999 mqm \
   && useradd --system --uid 999 --gid mqm mqperf \
+  && usermod -a -G root mqperf \
   && echo mqperf:orland02 | chpasswd \
   && mkdir -p /home/mqperf/cph \
-  && chown -R mqperf /home/mqperf/cph \
+  && chown -R mqperf:root /home/mqperf/cph \
+  && chmod -R g+w /home/mqperf/cph \
   && echo "cd ~/cph" >> /home/mqperf/.bashrc
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
   && dpkg -i ibmmq-runtime_9.2.3.0_amd64.deb \
   && dpkg -i ibmmq-gskit_9.2.3.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.2.3.0_amd64.deb 
+  && dpkg -i ibmmq-client_9.2.3.0_amd64.deb \
+  && chown -R mqperf:root /opt/mqm/*
 
 COPY cph/* /home/mqperf/cph/
 COPY ssl/* /opt/mqm/ssl/
