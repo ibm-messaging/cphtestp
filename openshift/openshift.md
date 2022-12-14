@@ -4,7 +4,7 @@ OpenShift Container Platform (OCP) cluster.
 
 Firstly, perform a Docker build of the performance harness as normal:
 ```
-docker build --tag chptestp .
+docker build --tag cphtestp .
 ```
 
 ## Creating the project/namespace and pushing images to the image registry
