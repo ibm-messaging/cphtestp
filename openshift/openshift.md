@@ -58,6 +58,11 @@ cat results.csv
 ```
 When the job is finished, you can obtain the results by viewing the pod logs `oc logs <cphtestp pod>`. Deleting the job will also delete the associated pod and its results.
 
+## Using a different namespace for cphtestp and MQ
+Earlier we showed how cphtestp and your MQ QM can communicate when are located in the same namespace, and can use either the svc name `perf0-ibm-com` or IP address assigned to our additional network `10.20.xx.yy` to communicate. Weve also made some recent changes to the repo, so that OpenShifts default rules concerning use of specific user IDs (the container will run under a provided numeric UID which will be a member of the root group) will be applied happily.
+
+If cphtestp is deployed to a different workspace, you still have two options for communication. As long as the pod is still connected to the additional network, you can use the IP address directly (you will have to query the target endpoint); or you can use the svcname suffixed with the name of the namespace i.e. `perf0-ibm-com.mqns`
+
 ## Congratulations!
 You have successfully configured the IBM CPH performance test harness to run in a Red Hat
 OpenShift cluster!
