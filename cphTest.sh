@@ -217,7 +217,7 @@ if [ -n "${MQ_DATA}" ] && [ ${MQ_DATA} -eq 1 ]; then
   cat /tmp/disklog
   cat /tmp/nhalog
   cat /home/mqperf/cph/output
-  env
+  env | sort
 fi
 
 if [ -n "${MQ_ERRORS}" ]; then
