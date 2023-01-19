@@ -69,9 +69,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.2.3.0_amd64.deb \
-  && dpkg -i ibmmq-gskit_9.2.3.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.2.3.0_amd64.deb \
+  && dpkg -i ibmmq-runtime_9.3.1.0_amd64.deb \
+  && dpkg -i ibmmq-gskit_9.3.1.0_amd64.deb \
+  && dpkg -i ibmmq-client_9.3.1.0_amd64.deb \
   && chown -R mqperf:root /opt/mqm/* \
   && chown -R mqperf:root /var/mqm/* \
   && chmod o+w /var/mqm
