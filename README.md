@@ -127,7 +127,7 @@ The use of the MQ_TLS_SNI_HOSTNAME environment variable only works with MQ clien
 Depending on the container runtime environment you are using, if you have problems creating enough application (and MQ client threads) in the cphtestp container, you may need to increase the PID limit. This can be configured on the `docker/podman run --pids-limit=8192 cphtestp` or more permanently in the `/usr/share/containers/containers.conf` file.
 
 ## MQ Auto Reconnect
-The MQ clients within the docker container can be configured to attempt to autoreconnect, by setting the MQ_AUTORECONNECT environment variable. This can be set to any of the MQ CNO reconnection options. Setting it to MQCNO_RECONNECT - the clients will attempt to reconnect using the same QMName, host and port configuration as the initial connection. By default, the functionality will remain MQCNO_RECONNECT_DISABLED.
+The MQ clients within the docker container can be configured to attempt to autoreconnect, by setting the MQ_AUTORECONNECT environment variable. This can be set to any of the MQ CNO reconnection options. Setting it to MQCNO_RECONNECT - the clients will attempt to reconnect using the same QMName, host and port configuration as the initial connection. By default, the functionality will remain MQCNO_RECONNECT_DISABLED. It should be noted that the underlying MQ client (cph) is not coded to support reliable reconnection in all circumstances.
 
 ## Embedded cph
 The version of cph contained in this image was taken on 5th April 2022 and built on 64bit xLinux. The most up to date cph code can be found here:
