@@ -3,6 +3,9 @@ Environment for creating a docker image running cph performance tests for Persis
 
 This repository contains a set of files to help create a Docker image containing the CPH executable and a set of scripts to run an inital set of performance tests.
 
+The Java version of this testharness using JMS interfaces is available here: https://github.com/ibm-messaging/jmstestp
+
+## Pre-requisites
 You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your docker image:
 * /lap/
 *  mqlicense.sh
