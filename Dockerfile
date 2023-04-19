@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 LABEL maintainer "Sam Massey <smassey@uk.ibm.com>"
 
@@ -69,9 +69,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.3.1.0_amd64.deb \
-  && dpkg -i ibmmq-gskit_9.3.1.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.3.1.0_amd64.deb \
+  && dpkg -i ibmmq-runtime_9.3.2.0_amd64.deb \
+  && dpkg -i ibmmq-gskit_9.3.2.0_amd64.deb \
+  && dpkg -i ibmmq-client_9.3.2.0_amd64.deb \
   && chown -R mqperf:root /opt/mqm/* \
   && chown -R mqperf:root /var/mqm/* \
   && chmod o+w /var/mqm
