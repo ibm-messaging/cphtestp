@@ -27,6 +27,8 @@ https://ibm.biz/mq93clients
 
 For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
 
+## Build and run as a standalone Docker container
+
 The Dockerfile will need to be edited to refer to the client version you have downloaded, then perform a docker build as normal:
 
 `docker build --tag cphtestp .`
