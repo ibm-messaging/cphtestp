@@ -46,7 +46,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     sysstat \
     procps \
     apt-utils \
-    dstat \
+    pcp \
     vim \
     iproute2 \
   # Apply any bug fixes not included in base Ubuntu or MQ image.
@@ -58,14 +58,15 @@ RUN export DEBIAN_FRONTEND=noninteractive \
   # Optional: Update the command prompt 
   && echo "cph" > /etc/debian_chroot \
   && sed -i 's/password\t\[success=1 default=ignore\]\tpam_unix\.so obscure sha512/password\t[success=1 default=ignore]\tpam_unix.so obscure sha512 minlen=8/' /etc/pam.d/common-password \
-  && groupadd --system --gid 999 mqm \
-  && useradd --system --uid 999 --gid mqm mqperf \
+  && groupadd --system --gid 1000 mqm \
+  && useradd --system --uid 1000 --gid mqm mqperf \
   && usermod -a -G root mqperf \
   && echo mqperf:orland02 | chpasswd \
   && mkdir -p /home/mqperf/cph \
   && chown -R mqperf:root /home/mqperf/cph \
   && chmod -R g+w /home/mqperf/cph \
-  && echo "cd ~/cph" >> /home/mqperf/.bashrc
+  && echo "cd ~/cph" >> /home/mqperf/.bashrc \
+  && service pmcd start
 
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
