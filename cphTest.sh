@@ -150,7 +150,7 @@ fi
 
 #Launch monitoring processes
 mpstat 10 > /tmp/mpstat &
-dstat --output /tmp/dstat 10 > /dev/null 2>&1 &
+pcp dstat --output /tmp/dstat 10 > /dev/null 2>&1 &
 if [ -n "${MQ_USERID}" ]; then
   if [ -n "${MQ_TLS_CIPHER}" ]; then
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
