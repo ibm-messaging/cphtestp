@@ -99,7 +99,7 @@ echo "----------------------------------------"
 echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" | tee -a /home/mqperf/cph/results
 echo "Clients using auto reconnect option: $reconnect" | tee -a /home/mqperf/cph/results
 
-echo "Using the following message sizes:" | tee -a /home/mqperf/cph/results
+echo -n "Using the following message sizes:" | tee -a /home/mqperf/cph/results
 for messageSize in ${msgsizestring}; do
   echo "$messageSize" | tee -a /home/mqperf/cph/results 
 done
