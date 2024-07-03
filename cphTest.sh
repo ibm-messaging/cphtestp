@@ -13,10 +13,10 @@ function runclients {
   cpu=$(awk '{print $12}' /tmp/mpstat | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?100-(total/NR):-1)}') 
   echo "CPU=$cpu" >> /home/mqperf/cph/results
 
-  readMB=$(awk -F ',' '{print $6}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024)):-1)}')
+  readMB=$(awk -F ',' '{print $6}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024)):-1)}')
   echo "Read=$readMB" >> /home/mqperf/cph/results
 
-  writeMB=$(awk -F ',' '{print $7}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024)):-1)}')
+  writeMB=$(awk -F ',' '{print $7}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024)):-1)}')
   echo "Write=$writeMB" >> /home/mqperf/cph/results
 
   recvGbs=$(awk -F ',' '{print $8}' /tmp/dstat | tail -n +8 | tail -6 |  awk '{total+=$1} END{printf "%0.2f",(NR?((total/NR)/(1024*1024*1024*0.125)):-1)}')
