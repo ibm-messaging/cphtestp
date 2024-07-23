@@ -25,6 +25,9 @@ https://ibm.biz/mq92clients
 The MQ V9.3 client can be obtained from:
 https://ibm.biz/mq93clients
 
+The MQ V9.4 client can be obtained from:
+https://ibm.biz/mq94clients
+
 For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
 
 ## Build and run as a standalone Docker container
@@ -70,7 +73,7 @@ In the latest release further configuration options have been added. The table b
 | MQ_TLS_SNI_HOSTNAME     | Use TLS SNI field to indicate target host            | FALSE              |
 | MQ_ERRORS               | Log MQ error log at end of test                      | FALSE              |
 | MQ_RUNLENGTH            | Length of each test iteration (seconds)              | 90                 |
-| MQ_AUTORECONNECT        | MQ Auto reconnection option                          | 
+| MQ_AUTORECONNECT        | MQ Auto reconnection option                          |                    |
 
 ## Test results
 The container will run a number of tests using different numbers of requester threads(incrementing in powers of 2) with messages of 2K, 20K and 200K. The scenario is a Request/Responder scenario as featured in the latest xLinux and Appliance performance reports available here:
@@ -135,5 +138,5 @@ Depending on the container runtime environment you are using, if you have proble
 The MQ clients within the docker container can be configured to attempt to autoreconnect, by setting the MQ_AUTORECONNECT environment variable. This can be set to any of the MQ CNO reconnection options. Setting it to MQCNO_RECONNECT - the clients will attempt to reconnect using the same QMName, host and port configuration as the initial connection. By default, the functionality will remain MQCNO_RECONNECT_DISABLED. It should be noted that the underlying MQ client (cph) is not coded to support reliable reconnection in all circumstances.
 
 ## Embedded cph
-The version of cph contained in this image was taken on 5th April 2022 and built on 64bit xLinux. The most up to date cph code can be found here:
+The version of cph contained in this image was taken on 3rd July 2024 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
