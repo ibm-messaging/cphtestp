@@ -219,7 +219,7 @@ if [ -n "${MQ_DATA}" ] && [ ${MQ_DATA} -eq 1 ]; then
   env | sort
 fi
 
-if [ -n "${MQ_ERRORS}" ]; then
+if [ -n "${MQ_ERRORS}" ] && [ "${MQ_ERRORS}" = "TRUE" ]; then
   cat /home/mqperf/cph/output
   cat /var/mqm/errors/AMQERR01.LOG
   env | sort
