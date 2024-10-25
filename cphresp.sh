@@ -13,7 +13,9 @@ userid="${MQ_USERID}"
 password="${MQ_PASSWORD}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 reconnect="${MQ_AUTORECONNECT:-MQCNO_RECONNECT_DISABLED}"
-compress="${MQ_COMPRESS:-FALSE}"
+compress="${MQ_COMPRESS:-false}"
+#Force to lower case using ,,
+compress="${compress,,}"
 
 
 if [ "${nonpersistent}" -eq 1 ]; then

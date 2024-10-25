@@ -15,7 +15,9 @@ password="${MQ_PASSWORD}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 runlength="${MQ_RUNLENGTH:-90}"
 reconnect="${MQ_AUTORECONNECT:-MQCNO_RECONNECT_DISABLED}"
-compress="${MQ_COMPRESS:-FALSE}"
+compress="${MQ_COMPRESS:-false}"
+#Force to lower case using ,,
+compress="${compress,,}"
 
 if [ "${nonpersistent}" -eq 1 ]; then
   persistent_flags="-tx false -pp false"
