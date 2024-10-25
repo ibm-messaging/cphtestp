@@ -79,6 +79,7 @@ msgsizestring="${MQ_MSGSIZE:-2048:20480:204800}"
 nonpersistent="${MQ_NON_PERSISTENT:-0}"
 responders="${MQ_RESPONDER_THREADS:-200}"
 reconnect="${MQ_AUTORECONNECT:-MQCNO_RECONNECT_DISABLED}"
+compress="${MQ_COMPRESS:-FALSE}"
 
 if [ "${nonpersistent}" = "1" ]; then
   persistent=0
@@ -98,6 +99,9 @@ echo "----------------------------------------"
 
 echo "Testing QM: $qmname on host: $host using port: $port and channel: $channel" | tee -a /home/mqperf/cph/results
 echo "Clients using auto reconnect option: $reconnect" | tee -a /home/mqperf/cph/results
+if [ "${compress}" -ne "FALSE" ]; then
+  echo "Clients using message compression. Will use server configuration." | tee -a /home/mqperf/cph/results
+fi
 
 echo -n "Using the following message sizes: " | tee -a /home/mqperf/cph/results
 for messageSize in ${msgsizestring}; do
