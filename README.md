@@ -144,5 +144,5 @@ The MQ clients within the docker container can be configured to attempt to autor
 The version of cph contained in this image was taken on 3rd July 2024 and built on 64bit xLinux. The most up to date cph code can be found here:
 https://github.com/ibm-messaging/mq-cph
 
-# Client channel compression
+## Client channel compression
 Set `MQ_COMPRESS` to TRUE to enable all client compression algorithms at the client. The specific compression algorithm to use can then be controlled by the QM CHANNEL configuration. We would recommend `LZ4FAST` in scenarios where you may be network restricted.
