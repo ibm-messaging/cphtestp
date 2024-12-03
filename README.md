@@ -1,12 +1,12 @@
 # cphtestp
-Environment for creating a docker image running cph performance tests for Persistent and Non Persistent MQ messaging.
+Environment for creating a container image running cph performance tests for Persistent and Non Persistent MQ messaging.
 
-This repository contains a set of files to help create a Docker image containing the CPH executable and a set of scripts to run an inital set of performance tests.
+This repository contains a set of files to help create a container image containing the CPH executable and a set of scripts to run an inital set of performance tests.
 
 The Java version of this testharness using JMS interfaces is available here: https://github.com/ibm-messaging/jmstestp
 
 ## Pre-requisites
-You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your docker image:
+You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your container image:
 * /lap/
 *  mqlicense.sh
 *  ibmmq-client_9.x.x.x_amd64.deb
@@ -30,9 +30,9 @@ https://ibm.biz/mq94clients
 
 For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
 
-## Build and run as a standalone Docker container
+## Build and run as a standalone container
 
-The Dockerfile will need to be edited to refer to the client version you have downloaded, then perform a docker build as normal:
+The Dockerfile will need to be edited to refer to the client version you have downloaded, then perform a container build as normal:
 
 `docker build --tag cphtestp .`
 
@@ -40,7 +40,7 @@ then run in network host mode to connect and run tests against a local QM:
 
 `docker run -it --detach --net="host" cphtestp`
 
-The default configuration looks for a QM located on the localhost called PERF0 with a listener configured on port 1420. The clients will send and receive persistent messages. You can override a number of options by setting environment variables on the docker run command.
+The default configuration looks for a QM located on the localhost called PERF0 with a listener configured on port 1420. The clients will send and receive persistent messages. You can override a number of options by setting environment variables on the container run command.
 
 `docker run -it --detach --net="host" --env MQ_QMGR_NAME=PERF1 --env MQ_QMGR_HOSTNAME=10.0.0.1 --env MQ_QMGR_PORT=1414 --env MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN --env MQ_QMGR_QREQUEST_PREFIX=REQUEST --env MQ_QMGR_QREPLY_PREFIX=REPLY cphtestp`
 
@@ -86,7 +86,7 @@ The final iteration will be with requester threads equal to the responder thread
 
 To ensure the timestamps created when testing match those of your hostmachines, you can edit `/usr/share/containers/containers.conf` and set `tz=local` to ensure that the container runs within the same timezone as that of the hostmachine.
 
-When the testing is complete the final results will be posted to the docker logs and can be viewed in the normal way:
+When the testing is complete the final results will be posted to the container logs and can be viewed in the normal way:
 
 `docker logs <containerID>`
 
@@ -138,7 +138,7 @@ The use of the MQ_TLS_SNI_HOSTNAME environment variable only works with MQ clien
 Depending on the container runtime environment you are using, if you have problems creating enough application (and MQ client threads) in the cphtestp container, you may need to increase the PID limit. This can be configured on the `docker/podman run --pids-limit=8192 cphtestp` or more permanently in the `/usr/share/containers/containers.conf` file.
 
 ## MQ Auto Reconnect
-The MQ clients within the docker container can be configured to attempt to autoreconnect, by setting the MQ_AUTORECONNECT environment variable. This can be set to any of the MQ CNO reconnection options. Setting it to MQCNO_RECONNECT - the clients will attempt to reconnect using the same QMName, host and port configuration as the initial connection. By default, the functionality will remain MQCNO_RECONNECT_DISABLED. It should be noted that the underlying MQ client (cph) is not coded to support reliable reconnection in all circumstances.
+The MQ clients within the container can be configured to attempt to autoreconnect, by setting the MQ_AUTORECONNECT environment variable. This can be set to any of the MQ CNO reconnection options. Setting it to MQCNO_RECONNECT - the clients will attempt to reconnect using the same QMName, host and port configuration as the initial connection. By default, the functionality will remain MQCNO_RECONNECT_DISABLED. It should be noted that the underlying MQ client (cph) is not coded to support reliable reconnection in all circumstances.
 
 ## Embedded cph
 The version of cph contained in this image was taken on 3rd July 2024 and built on 64bit xLinux. The most up to date cph code can be found here:
