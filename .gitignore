@@ -1,5 +1,6 @@
 #Ignore debian files
 *.deb
+*.rpm
 
 #Ignore tgz files
 *.tgz

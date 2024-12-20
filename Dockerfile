@@ -12,76 +12,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# FROM ubuntu:22.04
-FROM quay.io/stmassey/ubuntu
+# See Dockerfile.ubuntu for an image based on Ubuntu 22.04
+FROM registry.access.redhat.com/ubi9/ubi:latest
 
 LABEL maintainer "Sam Massey <smassey@uk.ibm.com>"
 
-COPY *.deb /
-COPY mqlicense.sh /
-COPY lap /lap
+# Add centos Appstream repo and import keys
+COPY centos.repo /etc/yum.repos.d
+RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official-SHA256
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-  # Install additional packages - do we need/want them all
-  && apt-get update -y \
-  && apt-get install -y --no-install-recommends \
-    bash \
-    bc \
-    ca-certificates \
-    coreutils \
-    curl \
-    debianutils \
-    file \
-    findutils \
-    gawk \
-    grep \
-    libc-bin \
-    lsb-release \
-    mount \
-    passwd \
-    sed \
-    tar \
-    util-linux \
-    iputils-ping \
-    sysstat \
-    procps \
-    apt-utils \
-    pcp \
-    vim \
-    iproute2 \
-  # Apply any bug fixes not included in base Ubuntu or MQ image.
-  # Don't upgrade everything based on Docker best practices https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/#run
-  && apt-get upgrade -y libkrb5-26-heimdal \
-  && apt-get upgrade -y libexpat1 \
-  # End of bug fixes
-  && rm -rf /var/lib/apt/lists/* \
-  # Optional: Update the command prompt 
-  && echo "cph" > /etc/debian_chroot \
-  && sed -i 's/password\t\[success=1 default=ignore\]\tpam_unix\.so obscure sha512/password\t[success=1 default=ignore]\tpam_unix.so obscure sha512 minlen=8/' /etc/pam.d/common-password \
-  && groupadd --system --gid 1000 mqm \
-  && useradd --system --uid 1000 --gid mqm mqperf \
-  && usermod -a -G root mqperf \
-  && echo mqperf:orland02 | chpasswd \
+# Add extra packages and setup user/group and shell config
+RUN dnf install -y wget bc file procps procps iputils vim file procps vim sysstat pcp pcp-system-tools \
+  && dnf update -y \
+  && dnf clean all \
+  && groupadd --gid 30000 mqm \
+  && useradd --uid 30000 --gid mqm mqperf \
   && mkdir -p /home/mqperf/cph \
   && chown -R mqperf:root /home/mqperf/cph \
   && chmod -R g+w /home/mqperf/cph \
   && echo "cd ~/cph" >> /home/mqperf/.bashrc \
-  && service pmcd start
+  # Update the command prompt with the container name, login and cwd
+  && echo "export PS1='cphtestp:\u@\h:\w\$ '" >> /home/mqperf/.bashrc \
+  && echo "cd ~/cph" >> /home/mqperf/.bashrc
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-  && ./mqlicense.sh -accept \
-  && dpkg -i ibmmq-runtime_9.4.0.0_amd64.deb \
-  && dpkg -i ibmmq-gskit_9.4.0.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.4.0.0_amd64.deb \
+# Copy files for MQ install and QM config  
+COPY *.rpm /
+COPY mqlicense.sh /
+COPY lap /lap
+COPY cph/* /home/mqperf/cph/
+COPY *.sh /home/mqperf/cph/
+COPY *.mqsc /home/mqperf/cph/
+COPY qmmonitor2 /home/mqperf/cph/
+
+# By runnig script, you accept the MQ client license, run ./mqlicense.sh -view to 
+ENV MQLICENSE=accept
+
+RUN ./mqlicense.sh -accept \
+  && rpm -Uvh MQSeriesRuntime-9.4.1-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesGSKit-9.4.1-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesClient-9.4.1-0.x86_64.rpm \
   && chown -R mqperf:root /opt/mqm/* \
   && chown -R mqperf:root /var/mqm/* \
   && chmod o+w /var/mqm
 
-COPY cph/* /home/mqperf/cph/
 COPY ssl/* /opt/mqm/ssl/
-COPY *.sh /home/mqperf/cph/
-COPY *.mqsc /home/mqperf/cph/
-COPY qmmonitor2 /home/mqperf/cph/
 USER mqperf
 WORKDIR /home/mqperf/cph
 
