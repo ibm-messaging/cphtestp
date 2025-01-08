@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# FROM ubuntu:22.04
+# FROM ubuntu:24.04
 FROM quay.io/stmassey/ubuntu
 
 LABEL maintainer "Sam Massey <smassey@uk.ibm.com>"
 
+# Copy MQ install files
 COPY *.deb /
 COPY mqlicense.sh /
 COPY lap /lap
@@ -50,34 +51,39 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     vim \
     iproute2 \
   && rm -rf /var/lib/apt/lists/* \
-  # Update the command prompt 
-  && echo "cph" > /etc/debian_chroot \
-  && groupadd --system --gid 1000 mqm \
-  && useradd --system --uid 1000 --gid mqm mqperf \
-  && usermod -a -G root mqperf \
+  && groupadd --system --gid 30000 mqm \
+  && useradd --system --uid 900 --gid mqm mqm \
+  && useradd --uid 30000 --gid mqm mqperf \
   && mkdir -p /home/mqperf/cph \
-  && chown -R mqperf:root /home/mqperf/cph \
-  && chmod -R g+w /home/mqperf/cph \
+  # Update the command prompt with the container name, login and cwd
+  && echo "export PS1='cphtestp:\u@\h:\w\$ '" >> /home/mqperf/.bashrc \
   && echo "cd ~/cph" >> /home/mqperf/.bashrc \
   && service pmcd start
 
+# By running script, you accept the MQ client license, run ./mqlicense.sh -view to view license
+ENV MQLICENSE=accept
 RUN export DEBIAN_FRONTEND=noninteractive \
   && ./mqlicense.sh -accept \
   && dpkg -i ibmmq-runtime_9.4.0.0_amd64.deb \
   && dpkg -i ibmmq-gskit_9.4.0.0_amd64.deb \
-  && dpkg -i ibmmq-client_9.4.0.0_amd64.deb \
-  && chown -R mqperf:root /opt/mqm/* \
-  && chown -R mqperf:root /var/mqm/* \
-  && chmod o+w /var/mqm
+  && dpkg -i ibmmq-client_9.4.0.0_amd64.deb
 
+# Copy files for QM config and scripts
+USER mqperf
 COPY cph/* /home/mqperf/cph/
 COPY ssl/* /opt/mqm/ssl/
 COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
 COPY qmmonitor2 /home/mqperf/cph/
+
+# Update ownership of files
+USER root
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && chown -R mqperf:mqm /opt/mqm/ssl \
+  && chown -R mqperf:mqm /home/mqperf/cph
+
 USER mqperf
 WORKDIR /home/mqperf/cph
-
 ENV MQ_QMGR_NAME=PERF0
 ENV MQ_QMGR_PORT=1420
 ENV MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN

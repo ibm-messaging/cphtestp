@@ -17,6 +17,11 @@ FROM registry.access.redhat.com/ubi9/ubi:latest
 
 LABEL maintainer "Sam Massey <smassey@uk.ibm.com>"
 
+# Copy MQ install files
+COPY *.rpm /
+COPY mqlicense.sh /
+COPY lap /lap
+
 # Add centos Appstream repo and import keys
 COPY centos.repo /etc/yum.repos.d
 RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official-SHA256
@@ -25,40 +30,36 @@ RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official-SHA256
 RUN dnf install -y wget bc file procps procps iputils vim file procps vim sysstat pcp pcp-system-tools \
   && dnf update -y \
   && dnf clean all \
-  && groupadd --gid 30000 mqm \
+  && groupadd --system --gid 30000 mqm \
+  && useradd --system --uid 900 --gid mqm mqm \
   && useradd --uid 30000 --gid mqm mqperf \
   && mkdir -p /home/mqperf/cph \
-  && chown -R mqperf:root /home/mqperf/cph \
-  && chmod -R g+w /home/mqperf/cph \
-  && echo "cd ~/cph" >> /home/mqperf/.bashrc \
   # Update the command prompt with the container name, login and cwd
   && echo "export PS1='cphtestp:\u@\h:\w\$ '" >> /home/mqperf/.bashrc \
   && echo "cd ~/cph" >> /home/mqperf/.bashrc
 
-# Copy files for MQ install and QM config  
-COPY *.rpm /
-COPY mqlicense.sh /
-COPY lap /lap
+# By running script, you accept the MQ client license, run ./mqlicense.sh -view to view license
+ENV MQLICENSE=accept
+RUN ./mqlicense.sh -accept \
+  && rpm -Uvh MQSeriesRuntime-9.4.1-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesGSKit-9.4.1-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesClient-9.4.1-0.x86_64.rpm
+
+# Copy files for QM config and scripts
+USER mqperf
+COPY ssl/* /opt/mqm/ssl/
 COPY cph/* /home/mqperf/cph/
 COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
 COPY qmmonitor2 /home/mqperf/cph/
 
-# By runnig script, you accept the MQ client license, run ./mqlicense.sh -view to 
-ENV MQLICENSE=accept
+# Update ownership of files
+USER root
+RUN chown -R mqperf:mqm /opt/mqm/ssl \
+  && chown -R mqperf:mqm /home/mqperf/cph
 
-RUN ./mqlicense.sh -accept \
-  && rpm -Uvh MQSeriesRuntime-9.4.1-0.x86_64.rpm \
-  && rpm -Uvh MQSeriesGSKit-9.4.1-0.x86_64.rpm \
-  && rpm -Uvh MQSeriesClient-9.4.1-0.x86_64.rpm \
-  && chown -R mqperf:root /opt/mqm/* \
-  && chown -R mqperf:root /var/mqm/* \
-  && chmod o+w /var/mqm
-
-COPY ssl/* /opt/mqm/ssl/
 USER mqperf
 WORKDIR /home/mqperf/cph
-
 ENV MQ_QMGR_NAME=PERF0
 ENV MQ_QMGR_PORT=1420
 ENV MQ_QMGR_CHANNEL=SYSTEM.DEF.SVRCONN
