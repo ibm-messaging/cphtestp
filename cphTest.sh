@@ -36,7 +36,7 @@ function runclients {
 }
 
 function getConcurrentClientsArray {
-  if  ! [ -z "${MQ_FIXED_CLIENTS}" ]; then
+  if  [ -n "${MQ_FIXED_CLIENTS}" ]; then
     clientsArray=(${MQ_FIXED_CLIENTS})
   else
     maximumClients=$1
@@ -55,7 +55,7 @@ function setupTLS {
 
   #Override mqclient.ini with SSL Key repository location and reuse count
   cp /opt/mqm/ssl/mqclient.ini /var/mqm/mqclient.ini
-  
+
   if [[ -n "${MQ_TLS_SNI_HOSTNAME}" ]]; then
     echo "  OutboundSNI=HOSTNAME" >> /var/mqm/mqclient.ini
   fi
@@ -64,7 +64,7 @@ function setupTLS {
   echo "DEFINE CHANNEL('$channel') CHLTYPE(CLNTCONN) CONNAME('$host($port)') SSLCIPH(${MQ_TLS_CIPHER}) QMNAME('$qmname') CERTLABL('${MQ_TLS_CERTLABEL}') REPLACE" | /opt/mqm/bin/runmqsc -n > /home/mqperf/cph/output 2>&1
 
   #Add certificate label to the mqclient.ini if we are flowing a client cert; adding it the local channel definition above will work in most cases if no CD is flowed from the application
-  #Support added to cph for specifying certlabel with -jw parm  
+  #Support added to cph for specifying certlabel with -jw parm
   #echo "  CertificateLabel=${MQ_TLS_CERTLABEL}" >> /var/mqm/mqclient.ini
 }
 
@@ -107,15 +107,15 @@ fi
 
 echo -n "Using the following message sizes: " | tee -a /home/mqperf/cph/results
 for messageSize in ${msgsizestring}; do
-  echo "$messageSize" | tee -a /home/mqperf/cph/results 
+  echo "$messageSize" | tee -a /home/mqperf/cph/results
 done
 
 #Temp check to kill pod if same IP address assigned to test harness than that used for QM
 #OCP/multus doesnt track issued IPs in 4.2
 if [ -n "${MQ_IP_CHECK}" ]; then
-  ipclash=`ip a | grep ${MQ_QMGR_HOSTNAME} | awk '{print $2}'`
+  ipclash=$(ip a | grep ${MQ_QMGR_HOSTNAME} | awk '{print $2}')
   if [ -n "${ipclash}" ]; then
-    echo "IP Assigned to QM is the same as assigned to test harness: $ipclash" 
+    echo "IP Assigned to QM is the same as assigned to test harness: $ipclash"
     exit
   fi
 fi
@@ -146,7 +146,7 @@ if ! ( [ -n "{MQ_CLEAR_QUEUES}" ] && [ "${MQ_CLEAR_QUEUES}" = "N" ] ); then
     # Need to flow userid and password to runmqsc
     echo "Using userid: ${MQ_USERID}" | tee -a /home/mqperf/cph/results
     echo ${MQ_PASSWORD} > /tmp/clearq.mqsc
-    cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc  
+    cat /home/mqperf/cph/clearq.mqsc >> /tmp/clearq.mqsc
     cat /tmp/clearq.mqsc | /opt/mqm/bin/runmqsc -c -u ${MQ_USERID} -w 60 $qmname > /home/mqperf/cph/output 2>&1
     rm -f /tmp/clearq.mqsc
   else
@@ -162,20 +162,24 @@ if [ -n "${MQ_USERID}" ]; then
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhalog 2>/tmp/nhalogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t RECOVERY -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhacrrlog 2>/tmp/nhacrrlogerr &
   else
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/disklog 2>/tmp/disklogerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/nhalog 2>/tmp/nhalogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t RECOVERY -o + -u ${MQ_USERID} -v ${MQ_PASSWORD} >/tmp/nhacrrlog 2>/tmp/nhacrrlogerr &
   fi
 else
   if [ -n "${MQ_TLS_CIPHER}" ]; then
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/disklog 2>/tmp/disklogerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhalog 2>/tmp/nhalogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t RECOVERY -o + -l ${MQ_TLS_CIPHER} -w ${MQ_TLS_CERTLABEL} >/tmp/nhacrrlog 2>/tmp/nhacrrlogerr &
   else
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c CPU -t SystemSummary >/tmp/system 2>/tmp/systemerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c DISK -t Log >/tmp/disklog 2>/tmp/disklogerr &
     ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t REPLICATION -o + >/tmp/nhalog 2>/tmp/nhalogerr &
+    ./qmmonitor2 -m $qmname -p $port -s $channel -h $host -c NHAREPLICA -t RECOVERY -o + >/tmp/nhacrrlog 2>/tmp/nhacrrlogerr &
   fi
 fi
 
@@ -222,6 +226,7 @@ if [ -n "${MQ_DATA}" ] && [ ${MQ_DATA} -eq 1 ]; then
   cat /tmp/system
   cat /tmp/disklog
   cat /tmp/nhalog
+  cat /tmp/nhacrrlog
   env | sort
 fi
 
