@@ -237,22 +237,24 @@ Update Type   :0001 0001 $SYS/MQ/INFO/QMGR/PERF0/Monitor/DISK/QMgrSummary
 TopicLen: 48
 Topic: $SYS/MQ/INFO/QMGR/PERF0/Monitor/DISK/QMgrSummarys file system - bytes in use
 Subscribing to topic: $SYS/MQ/INFO/QMGR/PERF0/Monitor/METADATA/DISK/Log
-Register Elem :0001 0002 0000 0001 Log - bytes in use
-Register Elem :0001 0002 0001 0001 Log - bytes max
-Register Elem :0001 0002 0002 0001 Log file system - bytes in use
-Register Elem :0001 0002 0003 0001 Log file system - bytes max
-Register Elem :0001 0002 0004 0002 Log - physical bytes written
-Register Elem :0001 0002 0005 0002 Log - logical bytes written
-Register Elem :0001 0002 0006 1000000 Log - write latency
-Register Elem :0001 0002 0007 10000 Log - current primary space in use
-Register Elem :0001 0002 0008 10000 Log - workload primary space utilization
-Register Elem :0001 0002 0009 1048576 Log - bytes required for media recovery
-Register Elem :0001 0002 0010 1048576 Log - bytes occupied by reusable extents
-Register Elem :0001 0002 0011 1048576 Log - bytes occupied by extents waiting to be archived
-Register Elem :0001 0002 0012 0001 Log - write size
-Register Elem :0001 0002 0013 10000 Log file system - free space
-Register Elem :0001 0002 0014 0003 Log - disk written log sequence number
-Register Elem :0001 0002 0015 0003 Log - quorum log sequence number
+0001 0002 0000 0001 Log - bytes in use
+0001 0002 0001 0001 Log - bytes max
+0001 0002 0002 0001 Log file system - bytes in use
+0001 0002 0003 0001 Log file system - bytes max
+0001 0002 0004 0002 Log - physical bytes written
+0001 0002 0005 0002 Log - logical bytes written
+0001 0002 0006 1000000 Log - write latency
+0001 0002 0007 10000 Log - current primary space in use
+0001 0002 0008 10000 Log - workload primary space utilization
+0001 0002 0009 1048576 Log - bytes required for media recovery
+0001 0002 0010 1048576 Log - bytes occupied by reusable extents
+0001 0002 0011 1048576 Log - bytes occupied by extents waiting to be archived
+0001 0002 0012 0001 Log - write size
+0001 0002 0013 10000 Log file system - free space
+0001 0002 0014 0003 Log - disk written log sequence number
+0001 0002 0015 0003 Log - quorum log sequence number
+0001 0002 0016 1000000 Log - Slowest write since restart
+0001 0002 0017 0001 Log - timestamp of slowest write
 Update Type   :0001 0002 $SYS/MQ/INFO/QMGR/PERF0/Monitor/DISK/Log
 TopicLen: 40
 Topic: $SYS/MQ/INFO/QMGR/PERF0/Monitor/DISK/Log
@@ -2021,10 +2023,15 @@ int sruFormatMessage(PMQCFH cfh, MQMD * pMd)
       printf("%" Int64 "u.%3.3" Int64 "u seconds", seconds, millisecs);
     }
     else if ( (cfin->Type == MQCFT_STRING)
-           && ( (cfin->Parameter == MQCA_Q_NAME) ||
-                (cfin->Parameter == MQCACF_APPL_NAME) ||
-                (cfin->Parameter == MQCACF_NHA_INSTANCE_NAME) ||
-                (cfin->Parameter == MQCACF_NHA_GROUP_NAME) ) )
+              && ( (cfin->Parameter == MQCA_Q_NAME)
+                  || (cfin->Parameter == MQCACF_APPL_NAME)
+#ifdef MQCACF_NHA_INSTANCE_NAME
+                  || (cfin->Parameter == MQCACF_NHA_INSTANCE_NAME)
+#endif
+#ifdef MQCACF_NHA_GROUP_NAME
+                  || (cfin->Parameter == MQCACF_NHA_GROUP_NAME)
+#endif
+                  ) )
     {
       cfst = (PMQCFST)cfin;
       pObjName = cfst->String;
@@ -2146,42 +2153,50 @@ void sruFormatElem( PMQCFIN   cfin
       }
       printf("%.*s %.2f%%\n", pElem->descLen, pElem->Buffer, f/100);
 		  // Search for the User and System CPU, and when both present add them up, print total to stderr and reset
-		  if (strncmp(pElem->Buffer, "User CPU", 8) == 0) {
-			  cpu_user = f;
+      if (strncmp(pElem->Buffer, "User CPU", 8) == 0) {
+        cpu_user = f;
 			  //printf("Setting User: %f\n", f);
-		  }
-		  if (strncmp(pElem->Buffer, "System CPU", 10) == 0) {
-			  cpu_system = f;
+      }
+      if (strncmp(pElem->Buffer, "System CPU", 10) == 0) {
+        cpu_system = f;
 			  //printf("Setting Sys: %f\n", f);
-		  }
-		  if ((cpu_user >= 0) && (cpu_system >= 0)) {
-			  cpu_util = cpu_user + cpu_system;
-			  fprintf(stderr, "cpu_util=%.2f\n", cpu_util / 100);
-			  cpu_user = -1;
-			  cpu_system = -1;
-		  }
-		  if (strncmp(pElem->Buffer, "lock contention", 15) == 0) {
+      }
+      if ((cpu_user >= 0) && (cpu_system >= 0)) {
+        cpu_util = cpu_user + cpu_system;
+        fprintf(stderr, "cpu_util=%.2f\n", cpu_util / 100);
+        cpu_user = -1;
+        cpu_system = -1;
+      }
+      if (strncmp(pElem->Buffer, "lock contention", 15) == 0) {
         fprintf(stderr, "q_lock=%.2f\n", f/100);
       }
       if (strncmp(pElem->Buffer, "queue avoided puts", 18) == 0) {
         fprintf(stderr, "q_avoid=%.2f\n", f/100);
       }
       if (strncmp(pElem->Buffer, "Log - current primary", 21) == 0) {
-     	  fprintf(stderr, "log_curr=%.2f\n", f/100);
+        fprintf(stderr, "log_curr=%.2f\n", f/100);
       }
       if (strncmp(pElem->Buffer, "Log - workload primary", 22) == 0) {
-     	  fprintf(stderr, "log_work=%.2f\n", f/100);
+        fprintf(stderr, "log_work=%.2f\n", f/100);
       }
       //NHAREPLICA (REPLICATION & RECOVERY)
       if (strncmp(pElem->Buffer, "Log file system - free space", 28) == 0) {
-     	  fprintf(stderr, "%.*s_nha_log_filesystem_free_space=%.2f\n", ObjNameLen, pObjName,f/100);
-      }      
+        if (pObjName) {
+          fprintf(stderr, "%.*s_nha_log_filesystem_free_space=%.2f\n", ObjNameLen, pObjName, f/100);
+        } else {
+          fprintf(stderr, "log_filesystem_free_space=%.2f\n", f/100);
+        }
+      }
       if (strncmp(pElem->Buffer, "Queue Manager file system - free space", 38) == 0) {
-     	  fprintf(stderr, "%.*s_nha_qm_filesystem_free_space=%.2f\n", ObjNameLen, pObjName,f/100);
-      }      
+        if (pObjName) {
+          fprintf(stderr, "%.*s_nha_qm_filesystem_free_space=%.2f\n", ObjNameLen, pObjName, f/100);
+        } else {
+          fprintf(stderr, "qm_filesystem_free_space=%.2f\n", f/100);
+        }
+      }
       break;
 
-    case MQIAMO_MONITOR_HUNDREDTHS:   //type: 100     
+    case MQIAMO_MONITOR_HUNDREDTHS:   //type: 100
       if (cfin->Type == MQCFT_INTEGER)
         f = (float)cfin->Value;
       else
@@ -2213,14 +2228,51 @@ void sruFormatElem( PMQCFIN   cfin
       //NHAREPLICA (REPLICATION & RECOVERY)
       if (strncmp(pElem->Buffer, "Queue Manager file system - bytes in use", 40) == 0) {
         if (cfin->Type == MQCFT_INTEGER)
-          fprintf(stderr, "%.*s_nha_qm_filesystem_mbytes=%d\n", ObjNameLen, pObjName, cfin->Value);
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_qm_filesystem_mbytes=%d\n", ObjNameLen, pObjName, cfin->Value);
+          } else {
+            fprintf(stderr, "qm_filesystem_mbytes=%d\n", cfin->Value);
+          }
         else
         {
           memcpy(&int64, &cfin64->Value, sizeof(int64));
-          fprintf(stderr, "%.*s_nha_qm_filesystem_mbytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_qm_filesystem_mbytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+          } else {
+            fprintf(stderr, "qm_filesystem_mbytes=%" Int64 "d\n", int64);
+          }
         }
-      }  
+      }
+      //Log
+      if (strncmp(pElem->Buffer, "Log - bytes required for media recovery", 39) == 0) {
+        if (cfin->Type == MQCFT_INTEGER)
+          fprintf(stderr, "log_media_recovery_mbytes=%d\n", cfin->Value);
+        else
+        {
+          memcpy(&int64, &cfin64->Value, sizeof(int64));
+          fprintf(stderr, "log_media_recovery_mbytes=%" Int64 "d\n", int64);
+        }
+      }
 
+      if (strncmp(pElem->Buffer, "Log - bytes occupied by reusable extents", 40) == 0) {
+        if (cfin->Type == MQCFT_INTEGER)
+          fprintf(stderr, "log_reusable_extents_mbytes=%d\n", cfin->Value);
+        else
+        {
+          memcpy(&int64, &cfin64->Value, sizeof(int64));
+          fprintf(stderr, "log_reusable_extents_mbytes=%" Int64 "d\n", int64);
+        }
+      }
+
+      if (strncmp(pElem->Buffer, "Log - bytes occupied by extents waiting to be archived", 54) == 0) {
+        if (cfin->Type == MQCFT_INTEGER)
+          fprintf(stderr, "log_extents_waiting_archive_mbytes=%d\n", cfin->Value);
+        else
+        {
+          memcpy(&int64, &cfin64->Value, sizeof(int64));
+          fprintf(stderr, "log_extents_waiting_archive_mbytes=%" Int64 "d\n", int64);
+        }
+      }
       break;
 
     case MQIAMO_MONITOR_GB:   //type: 100000000
@@ -2235,13 +2287,16 @@ void sruFormatElem( PMQCFIN   cfin
       break;
 
 	  case MQIAMO_MONITOR_MICROSEC:   //type: 1000000
-		  if (cfin->Type == MQCFT_INTEGER) {
-			  printf("%.*s %d uSec\n", pElem->descLen, pElem->Buffer,	cfin->Value);
-			  if (strncmp(pElem->Buffer, "Log - write latency", 19) == 0) {
-				  fprintf(stderr, "log_lat=%d\n", cfin->Value);
-			  }
-			  if (strncmp(pElem->Buffer, "average queue time", 18) == 0) {
+      if (cfin->Type == MQCFT_INTEGER) {
+        printf("%.*s %d uSec\n", pElem->descLen, pElem->Buffer,	cfin->Value);
+        if (strncmp(pElem->Buffer, "Log - write latency", 19) == 0) {
+          fprintf(stderr, "log_lat=%d\n", cfin->Value);
+        }
+        if (strncmp(pElem->Buffer, "average queue time", 18) == 0) {
           fprintf(stderr, "q_time=%d\n", cfin->Value);
+        }
+        if (strncmp(pElem->Buffer, "Log - slowest write since restart", 33) == 0) {
+          fprintf(stderr, "log_slowest_write=%d\n", cfin->Value);
         }
         //NHAREPLICA (REPLICATION & RECOVERY)
         if (strncmp(pElem->Buffer, "Log write average acknowledgement latency", 41) == 0) {
@@ -2249,61 +2304,64 @@ void sruFormatElem( PMQCFIN   cfin
         }
         if (strncmp(pElem->Buffer, "Synchronous log data average compression time", 45) == 0) {
           fprintf(stderr, "%.*s_nha_sync_compress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
-        } 
+        }
         if (strncmp(pElem->Buffer, " Catch-up log data average compression time", 42) == 0) {
           fprintf(stderr, "%.*s_nha_catchup_compress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
-        } 
+        }
         if (strncmp(pElem->Buffer, "Average network round trip time", 31) == 0) {
-          fprintf(stderr, "%.*s_nha_net_round_trip=%d\n", ObjNameLen, pObjName, cfin->Value); 
+          fprintf(stderr, "%.*s_nha_net_round_trip=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
         if (strncmp(pElem->Buffer, "Synchronous log data average decompression time", 47) == 0) {
           fprintf(stderr, "%.*s_nha_sync_decompress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
-        if (strncmp(pElem->Buffer, "Catch-up log data average decompression time", 44) == 0) { 
+        if (strncmp(pElem->Buffer, "Catch-up log data average decompression time", 44) == 0) {
           fprintf(stderr,"%.*s_nha_catchup_decompress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
-        if (strncmp(pElem->Buffer, "Log data average compression time", 33) == 0) { 
+        if (strncmp(pElem->Buffer, "Log data average compression time", 33) == 0) {
           fprintf(stderr,"%.*s_nha_log_compress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
-        if (strncmp(pElem->Buffer, "Log data average decompression time", 35) == 0) { 
+        if (strncmp(pElem->Buffer, "Log data average decompression time", 35) == 0) {
           fprintf(stderr,"%.*s_nha_log_decompress_time=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
-		  }
+      }
       else
       {
         memcpy(&int64, &cfin64->Value, sizeof(int64));
         printf("%.*s %" Int64 "d uSec\n", pElem->descLen, pElem->Buffer, int64);
-		    if (strncmp(pElem->Buffer, "Log - write latency", 19) == 0) {
-			    fprintf(stderr, "log_lat=%" Int64 "d\n", int64);
-		    }
-		    if (strncmp(pElem->Buffer, "average queue time", 18) == 0) {
-       	  fprintf(stderr, "q_time=%" Int64 "d\n", int64);
+        if (strncmp(pElem->Buffer, "Log - write latency", 19) == 0) {
+          fprintf(stderr, "log_lat=%" Int64 "d\n", int64);
+        }
+        if (strncmp(pElem->Buffer, "average queue time", 18) == 0) {
+          fprintf(stderr, "q_time=%" Int64 "d\n", int64);
+        }
+        if (strncmp(pElem->Buffer, "Log - slowest write since restart", 33) == 0) {
+          fprintf(stderr, "log_slowest_write=%" Int64 "d\n", int64);
         }
         //NHAREPLICA (REPLICATION & RECOVERY)
         if (strncmp(pElem->Buffer, "Log write average acknowledgement latency", 41) == 0) {
-       	  fprintf(stderr, "%.*s_nha_log_ack_lat=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        } 
+          fprintf(stderr, "%.*s_nha_log_ack_lat=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+        }
         if (strncmp(pElem->Buffer, "Synchronous log data average compression time", 45) == 0) {
           fprintf(stderr, "%.*s_nha_sync_compress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }              
+        }
         if (strncmp(pElem->Buffer, "Catch-up log data average compression time", 42) == 0) {
           fprintf(stderr, "%.*s_nha_catchup_compress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        } 
+        }
         if (strncmp(pElem->Buffer, "Average network round trip time", 31) == 0) {
           fprintf(stderr, "%.*s_nha_net_round_trip=%" Int64 "d\n", ObjNameLen, pObjName, int64);
         }
         if (strncmp(pElem->Buffer, "Synchronous log data average decompression time", 47) == 0) {
           fprintf(stderr, "%.*s_nha_sync_decompress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }        
+        }
         if (strncmp(pElem->Buffer, "Catch-up log data average decompression time", 44) == 0) {
-          fprintf(stderr,"%.*s_nha_catchup_decompress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);           
-	      }
+          fprintf(stderr,"%.*s_nha_catchup_decompress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+        }
         if (strncmp(pElem->Buffer, "Log data average compression time", 33) == 0) {
           fprintf(stderr, "%.*s_nha_log_compress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }        
+        }
         if (strncmp(pElem->Buffer, "Log data average decompression time", 35) == 0) {
-          fprintf(stderr,"%.*s_nha_log_decompress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);           
-	      }
+          fprintf(stderr,"%.*s_nha_log_decompress_time=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+        }
       }
       break;
 
@@ -2335,10 +2393,10 @@ void sruFormatElem( PMQCFIN   cfin
       }
       //DISK LOG
       if (strncmp(pElem->Buffer, "Log - physical", 14) == 0) {
-   	      fprintf(stderr, "log_phy=%" Int64 "d\n", rate);
+        fprintf(stderr, "log_phy=%" Int64 "d\n", rate);
       }
       if (strncmp(pElem->Buffer, "Log - logical", 13) == 0) {
-   	      fprintf(stderr, "log_log=%" Int64 "d\n", rate);
+        fprintf(stderr, "log_log=%" Int64 "d\n", rate);
       }
 
       //STATMQI PUT
@@ -2432,6 +2490,7 @@ void sruFormatElem( PMQCFIN   cfin
       }
       break;
 
+#ifdef MQIAMO_MONITOR_LSN
     case MQIAMO_MONITOR_LSN:  //type: 3
       if (cfin->Type == MQCFT_INTEGER)
         printf("%.*s %d\n", pElem->descLen, pElem->Buffer, cfin->Value);
@@ -2454,7 +2513,7 @@ void sruFormatElem( PMQCFIN   cfin
           memcpy(&int64, &cfin64->Value, sizeof(int64));
           sruINT64toLSN(int64, &lsn);
           fprintf(stderr, "%.*s_nha_ack_log_seq_num=<%hu:%hu:%hu:%hu> 0x%16.16"Int64"x\n", ObjNameLen, pObjName,
-               sruWORD(lsn.word[0]), sruWORD(lsn.word[1]), sruWORD(lsn.word[2]), sruWORD(lsn.word[3]), int64);
+                  sruWORD(lsn.word[0]), sruWORD(lsn.word[1]), sruWORD(lsn.word[2]), sruWORD(lsn.word[3]), int64);
         }
       }
       if (strncmp(pElem->Buffer, "Recovery log sequence number", 28) == 0) {
@@ -2466,93 +2525,123 @@ void sruFormatElem( PMQCFIN   cfin
           memcpy(&int64, &cfin64->Value, sizeof(int64));
           sruINT64toLSN(int64, &lsn);
           fprintf(stderr, "%.*s_nha_recovery_log_sequence_num=<%hu:%hu:%hu:%hu> 0x%16.16"Int64"x\n", ObjNameLen, pObjName,
-               sruWORD(lsn.word[0]), sruWORD(lsn.word[1]), sruWORD(lsn.word[2]), sruWORD(lsn.word[3]), int64);
+                  sruWORD(lsn.word[0]), sruWORD(lsn.word[1]), sruWORD(lsn.word[2]), sruWORD(lsn.word[3]), int64);
         }
       }
-
+#endif
 
       break;
 
     default:    //type: 1 - MQIAMO_MONITOR_UNIT
       if (cfin->Type == MQCFT_INTEGER) {
         printf("%.*s %d\n", pElem->descLen, pElem->Buffer, cfin->Value);
-			  if (strncmp(pElem->Buffer, "Log - write size", 16) == 0) {
-				  fprintf(stderr, "log_siz=%d\n", cfin->Value);
-			  }
-			  if (strncmp(pElem->Buffer, "Queue depth", 11) == 0) {
+        if (strncmp(pElem->Buffer, "Log - write size", 16) == 0) {
+          fprintf(stderr, "log_siz=%d\n", cfin->Value);
+        }
+        if (strncmp(pElem->Buffer, "Queue depth", 11) == 0) {
           fprintf(stderr, "q_depth=%d\n", cfin->Value);
         }
         if (strncmp(pElem->Buffer, "Log write average acknowledgement size", 38) == 0) {
           fprintf(stderr, "%.*s_nha_log_ack_size=%d\n", ObjNameLen, pObjName, cfin->Value);
-        } 
-			  if (strncmp(pElem->Buffer, "Backlog bytes", 13) == 0) {
+        }
+        if (strncmp(pElem->Buffer, "Backlog bytes", 13) == 0) {
           fprintf(stderr, "%.*s_nha_backlog_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }   			      
+        }
         if (strncmp(pElem->Buffer, "Backlog average bytes", 11) == 0) {
           fprintf(stderr, "%.*s_nha_backlog_avg_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
         }
         if (strncmp(pElem->Buffer, "Synchronous log bytes decompressed", 34) == 0) {
           fprintf(stderr, "%.*s_nha_sync_decompressed_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        
+        }
         if (strncmp(pElem->Buffer, "Catch-up log bytes decompressed", 31) == 0) {
           fprintf(stderr, "%.*s_nha_catchup_decompressed_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        
+        }
         if (strncmp(pElem->Buffer, "Log file system - bytes in use", 30) == 0) {
-          fprintf(stderr, "%.*s_nha_log_filesystem_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_log_filesystem_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
+          } else {
+            fprintf(stderr, "log_filesystem_bytes=%d\n", cfin->Value);
+          }
+        }
         if (strncmp(pElem->Buffer, "MQ FDC file count", 17) == 0) {
-          fprintf(stderr, "%.*s_nha_fdc_file_count=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        		                       
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_fdc_file_count=%d\n", ObjNameLen, pObjName, cfin->Value);
+          } else {
+            fprintf(stderr, "fdc_file_count=%d\n", cfin->Value);
+          }
+        }
         if (strncmp(pElem->Buffer, "Compressed log bytes sent", 25) == 0) {
           fprintf(stderr, "%.*s_nha_log_compressed_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        		                       
+        }
         if (strncmp(pElem->Buffer, "Log bytes decompressed", 22) == 0) {
           fprintf(stderr, "%.*s_nha_log_decompressed_bytes=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        		                       
+        }
         if (strncmp(pElem->Buffer, "Rebase count", 12) == 0) {
           fprintf(stderr, "%.*s_nha_rebase_count=%d\n", ObjNameLen, pObjName, cfin->Value);
-        }        		                       
-		  } else {
-		    memcpy(&int64, &cfin64->Value, sizeof(int64)); 
-			  printf("%.*s %" Int64 "d\n", pElem->descLen, pElem->Buffer,	int64);
-		    if (strncmp(pElem->Buffer, "Log - write size", 16) == 0) {
-			    fprintf(stderr, "log_siz=%" Int64 "d\n", int64);
-		    }
-		    if (strncmp(pElem->Buffer, "Queue depth", 11) == 0) {
+        }
+        if (strncmp(pElem->Buffer, "Log - timestamp of slowest write", 32) == 0) {
+          if (pObjName) {
+            fprintf(stderr, "%.*s_log_timestamp_slowest_write=%d\n", ObjNameLen, pObjName, cfin->Value);
+          } else {
+            fprintf(stderr, "log_timestamp_slowest_write=%d\n", cfin->Value);
+          }
+        }
+      } else {
+        memcpy(&int64, &cfin64->Value, sizeof(int64)); 
+        printf("%.*s %" Int64 "d\n", pElem->descLen, pElem->Buffer,	int64);
+        if (strncmp(pElem->Buffer, "Log - write size", 16) == 0) {
+          fprintf(stderr, "log_siz=%" Int64 "d\n", int64);
+        }
+        if (strncmp(pElem->Buffer, "Queue depth", 11) == 0) {
           fprintf(stderr, "q_depth=%" Int64 "d\n", int64);
         }
         if (strncmp(pElem->Buffer, "Log write average acknowledgement size", 38) == 0) {
           fprintf(stderr, "%.*s_nha_log_ack_siz=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        } 
-			  if (strncmp(pElem->Buffer, "Backlog bytes", 13) == 0) {
+        }
+        if (strncmp(pElem->Buffer, "Backlog bytes", 13) == 0) {
           fprintf(stderr, "%.*s_nha_backlog_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }   			      
+        }
         if (strncmp(pElem->Buffer, "Backlog average bytes", 11) == 0) {
           fprintf(stderr, "%.*s_nha_backlog_avg_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        } 
+        }
         if (strncmp(pElem->Buffer, "Synchronous log bytes decompressed", 34) == 0) {
           fprintf(stderr, "%.*s_nha_sync_decompressed_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }   	                   
+        }
         if (strncmp(pElem->Buffer, "Catch-up log bytes decompressed", 31) == 0) {
           fprintf(stderr, "%.*s_nha_catchup_decompressed_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }   	                   
+        }
         if (strncmp(pElem->Buffer, "Log file system - bytes in use", 30) == 0) {
-          fprintf(stderr, "%.*s_nha_log_filesystem_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }              
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_log_filesystem_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+          } else {
+            fprintf(stderr, "log_filesystem_bytes=%" Int64 "d\n", int64);
+          }
+        }
         if (strncmp(pElem->Buffer, "MQ FDC file count", 17) == 0) {
-          fprintf(stderr, "%.*s_nha_fdc_file_count=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }  
+          if (pObjName) {
+            fprintf(stderr, "%.*s_nha_fdc_file_count=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+          } else {
+            fprintf(stderr, "fdc_file_count=%" Int64 "d\n", int64);
+          }
+        }
         if (strncmp(pElem->Buffer, "Compressed log bytes sent", 25) == 0) {
           fprintf(stderr, "%.*s_nha_log_compressed_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }  
+        }
         if (strncmp(pElem->Buffer, "Log bytes decompressed", 22) == 0) {
           fprintf(stderr, "%.*s_nha_log_decompressed_bytes=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }  
+        }
         if (strncmp(pElem->Buffer, "Rebase count", 12) == 0) {
           fprintf(stderr, "%.*s_nha_rebase_count=%" Int64 "d\n", ObjNameLen, pObjName, int64);
-        }            
-		  }
-		  break;
+        }
+        if (strncmp(pElem->Buffer, "Log - timestamp of slowest write", 32) == 0) {
+          if (pObjName) {
+            fprintf(stderr, "%.*s_log_timestamp_slowest_write=%" Int64 "d\n", ObjNameLen, pObjName, int64);
+          } else {
+            fprintf(stderr, "log_timestamp_slowest_write=%" Int64 "d\n", int64);
+          }
+        }
+      }
+      break;
 	}
 	return;
 }
