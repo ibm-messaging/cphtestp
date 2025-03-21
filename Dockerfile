@@ -41,9 +41,9 @@ RUN dnf install -y wget bc file procps procps iputils vim file procps vim syssta
 # By running script, you accept the MQ client license, run ./mqlicense.sh -view to view license
 ENV MQLICENSE=accept
 RUN ./mqlicense.sh -accept \
-  && rpm -Uvh MQSeriesRuntime-9.4.1-0.x86_64.rpm \
-  && rpm -Uvh MQSeriesGSKit-9.4.1-0.x86_64.rpm \
-  && rpm -Uvh MQSeriesClient-9.4.1-0.x86_64.rpm
+  && rpm -Uvh MQSeriesRuntime-9.4.2-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesGSKit-9.4.2-0.x86_64.rpm \
+  && rpm -Uvh MQSeriesClient-9.4.2-0.x86_64.rpm
 
 # Copy files for QM config and scripts
 USER mqperf
