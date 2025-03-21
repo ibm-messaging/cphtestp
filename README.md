@@ -9,6 +9,11 @@ The Java version of this testharness using JMS interfaces is available here: htt
 You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your container image:
 * /lap/
 *  mqlicense.sh
+*  MQSeriesClient-9.4.1-0.x86_64.rpm
+*  MQSeriesGSKit-9.4.1-0.x86_64.rpm
+*  MQSeriesRuntime-9.4.1-0.x86_64.rpm
+
+If you intend on running an Ubuntu base image, the following would be required
 *  ibmmq-client_9.x.x.x_amd64.deb
 *  ibmmq-gskit_9.x.x.x_amd64.deb
 *  ibmmq-runtime_9.x.x.x_amd64.deb
@@ -28,7 +33,7 @@ https://ibm.biz/mq93clients
 The MQ V9.4 client can be obtained from:
 https://ibm.biz/mq94clients
 
-For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the IBM-MQC-UbuntuLinuxX64 download.
+For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the 9.4.x.0-IBM-MQC-LinuxX64 download.
 
 ## Build and run as a standalone container
 
