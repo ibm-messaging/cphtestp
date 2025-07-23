@@ -52,11 +52,14 @@ COPY cph/* /home/mqperf/cph/
 COPY *.sh /home/mqperf/cph/
 COPY *.mqsc /home/mqperf/cph/
 COPY qmmonitor2 /home/mqperf/cph/
+COPY *.json /home/mqperf/cph
+COPY *.random /home/mqperf/cph
 
-# Update ownership of files
+# Update ownership of files, and allow writing to cph folder by all IDs (rootless)
 USER root
 RUN chown -R mqperf:mqm /opt/mqm/ssl \
-  && chown -R mqperf:mqm /home/mqperf/cph
+  && chown -R mqperf:mqm /home/mqperf/cph \
+  && chmod 777 /home/mqperf/cph
 
 USER mqperf
 WORKDIR /home/mqperf/cph
@@ -69,5 +72,6 @@ ENV MQ_NON_PERSISTENT=
 ENV MQ_CPH_EXTRA=
 ENV MQ_USERID=
 ENV MQ_COMPRESS=
+ENV MQ_MSG_JSON=
 
 ENTRYPOINT ["./cphTest.sh"]

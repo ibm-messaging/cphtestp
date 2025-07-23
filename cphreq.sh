@@ -18,6 +18,9 @@ reconnect="${MQ_AUTORECONNECT:-MQCNO_RECONNECT_DISABLED}"
 compress="${MQ_COMPRESS:-false}"
 #Force to lower case using ,,
 compress="${compress,,}"
+json="${MQ_MSG_JSON:-false}"
+json="${json,,}"
+messagefile=
 
 if [ "${nonpersistent}" -eq 1 ]; then
   persistent_flags="-tx false -pp false"
@@ -25,9 +28,12 @@ else
   persistent_flags="-tx true -pp true"
 fi
 
+if [[ "${json}" == "true" ]]; then
+  messagefile=$msgsize."json"
+fi
 
 if [ -n "${MQ_USERID}" ]; then
-  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect -us $userid -pw $password $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL} -cz $compress
+  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect -us $userid -pw $password $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL} -cz $compress -mf $messagefile
 else
-  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL} -cz $compress
+  ./cph -nt $threads -ms $msgsize -rl $runlength -id 1 -tc Requester -ss 10 -iq $requestq -oq $replyq -db 1 -dx 10 -jp $port -jc $channel -jb $qmname -jt $BINDINGS -jh $host -wi 10 -to 30 $persistent_flags -ar $reconnect $extra -jl ${MQ_TLS_CIPHER} -jw ${MQ_TLS_CERTLABEL} -cz $compress -mf $messagefile
 fi
