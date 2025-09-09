@@ -152,3 +152,6 @@ https://github.com/ibm-messaging/mq-cph
 
 ## Client channel compression
 Set `MQ_COMPRESS` to TRUE to enable all client compression algorithms at the client. The specific compression algorithm to use can then be controlled by the QM CHANNEL configuration. We would recommend `LZ4FAST` in scenarios where you may be network restricted.
+
+## JSON Message support 
+SET `MQ_MSG_JSON` to TRUE to enable the use of JSON formatted messages. Only applies to messages of size: 2048, 20480, 204800. Uses static json files included in image, rather than generated messages.
