@@ -81,6 +81,7 @@ In the latest release further configuration options have been added. The table b
 | MQ_RUNLENGTH            | Length of each test iteration (seconds)              | 90                 |
 | MQ_AUTORECONNECT        | MQ Auto reconnection option                          |                    |
 | MQ_COMPRESS             | Enable client compression algorithms                 | FALSE              |
+| MQ_MSG_JSON             | Enable JSON messages (2048,20480,204800)             | FALSE              |
 
 
 ## Test results
