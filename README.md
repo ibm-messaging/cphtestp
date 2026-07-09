@@ -9,14 +9,14 @@ The Java version of this testharness using JMS interfaces is available here: htt
 You will need to seperately download the MQ Client (for which license agreement is required) and copy the following files into the root directory before building your container image:
 * /lap/
 *  mqlicense.sh
-*  MQSeriesClient-9.4.2-0.x86_64.rpm
-*  MQSeriesGSKit-9.4.2-0.x86_64.rpm
-*  MQSeriesRuntime-9.4.2-0.x86_64.rpm
+*  MQSeriesClient-10.x.y-0.x86_64.rpm
+*  MQSeriesGSKit-10.x.y-0.x86_64.rpm
+*  MQSeriesRuntime-10.x.y-0.x86_64.rpm
 
 If you intend on running an Ubuntu base image, the following would be required
-*  ibmmq-client_9.x.x.x_amd64.deb
-*  ibmmq-gskit_9.x.x.x_amd64.deb
-*  ibmmq-runtime_9.x.x.x_amd64.deb
+*  ibmmq-client_10.x.x.x_amd64.deb
+*  ibmmq-gskit_10.x.x.x_amd64.deb
+*  ibmmq-runtime_10.x.x.x_amd64.deb
 
 The MQ V9 client can be obtained from:
 http://www-01.ibm.com/support/docview.wss?uid=swg24042176
@@ -33,7 +33,10 @@ https://ibm.biz/mq93clients
 The MQ V9.4 client can be obtained from:
 https://ibm.biz/mq94clients
 
-For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the 9.4.x.0-IBM-MQC-LinuxX64 download.
+The MQ V10 client can be obtained from: 
+[MQ-V10-Client](https://www.ibm.com/support/fixcentral/swg/selectFixes?parent=ibm~WebSphere&product=ibm/WebSphere/WebSphere+MQ&release=10.0.0.0&platform=All&function=fixid&fixids=*-IBM-MQC-*,*-IBM-MQ-Install-Java-All*,*-IBM-MQ-Java-InstallRA*)
+
+For the above downloads, filter the fixpack selection platform to Linux 64 bit, x86_64, and select the 10.x.y.0-IBM-MQC-LinuxX64 download.
 
 ## Build and run as a standalone container
 
